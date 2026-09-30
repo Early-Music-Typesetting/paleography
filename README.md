@@ -174,7 +174,7 @@ quo flectı ıuſtıcıa
 poſſꝫ a rıgoꝛe.
 ```
 
-We could use a chosen font (e.g. Marcos' `Gothica Rotunda`) and assign the it's corresponding glyphs to the rules:
+We could use a paleography-specialized font (e.g. Marcos' `Gothica Rotunda`) and assign its corresponding glyphs to the rules:
 
 
 ```yaml
