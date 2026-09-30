@@ -93,9 +93,9 @@ The most common approaches tend to have clear downsides.
 
 The focus of this (small) specification is to provide an easy-to-learn, quick and interoperable way of encoding Latin texts that can be implemented on any displaying platform.
 
-A big merit of _Paleography_ is that it separates spelling _directives_ from the desired rendering of the font glyphs. The editor marks which spelling option is used. A separate routine should take care of supplying the correct glyphs from a font.
+A big merit of _Paleography_ is that it separates spelling _directives_ from the desired rendering of the font glyphs. The editor marks which spelling option is used. A separate routine should take care of supplying the correct glyphs for a selected font.
 
-This specifications is meant as a proxy encoding allowing generation of e.g. TEI, font- and platform-specific encodings etc.
+_Paleography can be used as a proxy encoding, allowing for generation of e.g. TEI, font- and platform-specific formats etc.
 
 ## Example text
 
