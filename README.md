@@ -1,6 +1,6 @@
 # Paleography
 
-This repository defines a minimalistic encoding specification for Latin Medieval and (early) Modern text spelling practices in musical sources.
+This repository defines a font-agnostic encoding specification for Latin Medieval and (early) Modern text spelling practices in musical sources.
 
 
 ![](./art/MLO_229r.png)
