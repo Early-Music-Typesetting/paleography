@@ -222,7 +222,8 @@ po$$ a rıgoe.
 **But alas!** It seems that we did not specified the glyphs for `-rum` and `con-` ligatures and the default unicode was used instead. This is because the font lacks those glyphs entirely (as for now..!).
 
 In such case it is up to the editor how to solve this issue:
-* remove rules for unsupported ligatures:
+
+#### Remove rules for unsupported ligatures:
   ```yaml
   rules:
     -rum: never
@@ -232,7 +233,7 @@ In such case it is up to the editor how to solve this issue:
 > [!CAUTION]
 > This is not recommended as it affects the `.paleo` file globaly.
 
-* use different but available glyphs:
+#### Use different but available glyphs:
   ```yaml
   font:
     Gothica Rotunda:
