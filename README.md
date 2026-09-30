@@ -384,7 +384,7 @@ _Tokens_ signalise that spelling needs to be modified according to _rules_ (set 
 
 # Future work
 
-- [ ] More love towards layout options in `.paleo` preamble: biting, kissing, treatment of feet :)
+- [ ] More love towards layout options in `.paleo` preamble: biting, kissing, treatment of feet.
 - [ ] More available glyphs preset for common fonts (Marcos, open-source etc)
 - [ ] Clearer demarkation of vowel abbreviations (like `qͥ`, `nͤ`).
 - [ ] More formal description of grammar
