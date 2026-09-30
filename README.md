@@ -229,8 +229,8 @@ In such case it is up to the editor how to solve this issue:
     con-: never
   ```
   
-  > [!CAUTION]
-  > This is not recommended as it affects the `.paleo` file globaly.
+> [!CAUTION]
+> This is not recommended as it affects the `.paleo` file globaly.
 
 * use different but available glyphs:
   ```yaml
@@ -239,8 +239,8 @@ In such case it is up to the editor how to solve this issue:
       -rum:  # using "rotunda" analog: `ꝝ`.
       con-:  # using "antisigma" analog: ↄ.
   ```
-  > [!IMPORTANT]
-  > Even though the **wrong** glyphs are displayed, the paleographical information is not affected. We can still safely export our original `.paleo` file to different format and its semantics will be correct.
+> [!IMPORTANT]
+> Even though the **wrong** glyphs are displayed, the paleographical information is not affected. We can still safely export our original `.paleo` file to different format and its semantics will be correct.
 
 The font does not have glyphs for `ꝶ` and `ↄ`, so the default unicode was used. 
 
