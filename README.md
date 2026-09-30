@@ -73,14 +73,14 @@ The most common approaches tend to have clear downsides.
     <space/>
     <choice><orig>ſ</orig><reg>s</reg></choice>ub figura
     <space/>
-    qu<expan>
-    <abbr rend="supraline">e</abbr>
-    <ex>m</ex>
-    </expan>
-    <expan>
-    <abbr><am>ꝓ</am></abbr>
-    <ex>pro</ex>
-    </expan>duxit radix pura
+    qu<choice>
+      <abbr rend="supraline"><am>e</am></abbr>
+      <expan><ex>em</ex></expan>
+    </choice>
+    <choice>
+      <abbr><am>ꝓ</am></abbr>
+      <expan><ex>pro</ex></expan>
+    </choice>duxit radix pura
     <!-- 
     (Note that I ignored to encode the 'dotless' `i`...)
     -->
