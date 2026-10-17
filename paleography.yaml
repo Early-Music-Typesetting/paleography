@@ -1,0 +1,154 @@
+$schema: "./paleography.schema.yaml"
+
+# TO DO:
+# - 'pattern' must contain a metacharacter.
+
+
+#   LETTER: "[]"
+#   substitute(str): /{{str}}/
+#   substitute-except-last(str): /{{str}}(?={{LETTER}})/
+#
+metacharacters:
+
+  change: "*"
+  abbreviate-start: "<"
+  abbreviate-end: ">"
+  ommit-start: "["
+  ommit-end: "]"
+  expand: "!"
+  macro-start: "\\"
+
+
+classes:
+
+  # TO DO
+  "*": []
+  "<": []
+  ">": []
+  "[": []
+  "]": []
+  "!": []
+  "\\": []
+  vowel: []
+
+
+substitutions:
+
+  # using MUFI "entity" names
+  # Name should be as close to MUFI as possible.
+  # 1) The "-suffix" indicates additional usage.
+  # 2) Presence of '-' indicating pre/in/suffix restricts substitution to be used as such.
+
+  # Final -ꝫ:
+  # https://en.wiktionary.org/wiki/ꝫ
+
+  -etfin-et:
+    class: abbreviation
+    pattern: e[:*:]t
+    unicode: ꝫ
+    mufi: etfin
+    allographs: []
+
+  -etfin-est:
+    class: abbreviation
+    pattern: e[:*:]st
+    unicode: ꝫ
+    mufi: etfin
+    allographs: []
+
+  -etfin-ue:
+    class: abbreviation
+    pattern: (q)[:*:]ue
+    unicode: qꝫ
+    mufi: etfin
+    allographs: []
+
+  -etfin-m:
+    class: allograph
+    pattern: ([aeu])[:*:]m
+    unicode: \1ꝫ
+    mufi: etfin
+    allographs: []
+
+  -etfin-us:
+    class: abbreviation
+    pattern: (b)[:*:]us
+    unicode: bꝫ
+    mufi: etfin
+    allographs: []
+
+  inodot:
+    class: allograph
+    pattern: i[:*:]
+    unicode: ı
+    mufi: inodot
+    allographs: [i]
+
+  nasal:
+    class: abbreviation
+    pattern: ([:vowel:])[:*:][mn]
+    unicode: \1̅ # mufi: bar
+    mufi: bar
+    allographs: []
+
+  slong:
+    class: allograph
+    pattern: s[:*:]
+    unicode: ſ
+    mufi: slong
+    allographs: [s]
+
+
+rule-definitions:
+
+  # A user interface to macra substitutions.
+  # Substitution names can be modified:
+  # 1) '-' before, after or both: pre-, in- or suffix.
+  # 2) '*' after name: substitution is triggered by 'change' metacharacter.
+
+  i-dotless:
+    always: [inodot]
+    indicated: [inodot*]
+    never: null
+
+  et-final:
+    always: [-etfin-et]
+    indicated: [-etfin-et*]
+    never: null
+
+  m-final:
+    always: [-etfin-m]
+    indicated: [-etfin-m*]
+    never: null
+
+  nasal:
+    always: [nasal]
+    indicated: [nasal*]
+    never: null
+
+  s-long:
+    always: [slong]
+    auto: [slong-, -slong-, -slong*]
+    indicated: [slong*]
+    never: null
+
+
+presets:
+
+  medieval:
+    - i-dotless: always
+    - s-long: auto
+    - et-final: indicated
+    - m-final: indicated
+    - nasal: indicated
+
+  renaissance:
+    - s-long: auto
+    - m-final: indicated
+    - nasal: indicated
+
+
+  # insular
+
+fonts:
+  ...
