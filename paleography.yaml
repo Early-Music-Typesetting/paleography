@@ -98,6 +98,16 @@ substitutions:
     mufi: slong
     allographs: [s]
 
+  # TO DO: final "fancy" curved s.
+
+  v-round:
+    class: allograph
+    pattern: v[:*:]
+    unicode: u
+    mufi: null
+    allographs: [v]
+
+  # u-angled:
 
 rule-definitions:
 
@@ -132,6 +142,11 @@ rule-definitions:
     indicated: [slong*]
     never: null
 
+  v-round:
+    always: [v-round]
+    indicated: [v-round*]
+    never: null
+
 
 presets:
 
@@ -146,6 +161,7 @@ presets:
     - s-long: auto
     - m-final: indicated
     - nasal: indicated
+    - v-round: always
 
 
   # insular
