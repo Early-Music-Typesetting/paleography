@@ -156,6 +156,7 @@ presets:
     - et-final: indicated
     - m-final: indicated
     - nasal: indicated
+    - v-round: always
 
   renaissance:
     - s-long: auto
