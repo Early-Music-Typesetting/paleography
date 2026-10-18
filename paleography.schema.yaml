@@ -4,12 +4,97 @@ $id: paleography
 type: object
 properties:
 
+  regexp-extensions:
+    title: Regexp extensions
+    description: Metasubstitutions for regexp patterns used by this specification.
+    patternProperties:
+      "[a-z]([a-z])":
+        type: object
+        properties:
+          doc:
+            title: Extention's Description
+            description: String with a documentation of the extension.
+            type: string
+          argumentPattern:
+            title: Argument Pattern
+            type: string
+            format: regex
+          evaluation:
+            title: Extention's Evaluation
+            description: How extension is executed (can use other extensions).
+          signature:
+            title: Signature (within the regex)
+            description: How this extension is realised within a Regex pattern.
+            type: string
+            format: regex
+          example:
+            title: Example call.
+            type: string
+        required: [doc, argumentPattern, evaluation, signature, example]
+        additionalProperties: false
+
+
   metacharacters:
-    description: "Test..."
+    title: Metacharacters
+    description: All the metacharacters used by this specification.
     type: object
+    properties:
+      change:
+        title: Change
+        description: Metacharacter indicating substitution/abbreviation.
+        $ref: "#/$defs/metacharacter"
+        example: ["*"]
+      abbreviate-start:
+        title: "Abbreviate: start"
+        description: Metacharacter starting contraction
+        $ref: "#/$defs/metacharacter"
+        example: ["<"]
+      abbreviate-end:
+        title: "Abbreviate: end"
+        description: Metacharacter ending contraction
+        $ref: "#/$defs/metacharacter"
+        example: [">"]
+      ommit-start:
+        title: "Ommission: start"
+        description: Metacharacter starting ommission
+        $ref: "#/$defs/metacharacter"
+        example: ["["]
+      ommit-end:
+        title: "Ommission: end"
+        description: Metacharacter ending ommission
+        $ref: "#/$defs/metacharacter"
+        example: ["]"]
+      expand:
+        title: Expand
+        description: This metacharacter tells client to ignore paleographic change/abbreviation/ommission while still allowing to annotate text correctly.
+        $ref: "#/$defs/metacharacter"
+        example: ["!"]
+      macro-start:
+        title: "Macro: start"
+        description: This character introduces macro.
+        $ref: "#/$defs/metacharacter"
+        example: ["\\"]
+    additionalProperties: false
+    required: [change, abbreviate-start, abbreviate-end, ommit-start, ommit-end, expand, macro-start]
 
   character-classes:
     type: object
+    title: Character classes
+    description: >
+      Characters defined in this object can be used in `substitution`'s regexp patterns
+      to match and substitute parts of the input text.
+      You can access them using Posix-inspired class syntax: `[:*:]`.
+      _Note_: You must always use the Paleography's default signs.
+    properties:
+      "*": {}
+      "<": {}
+      ">": {}
+      "[": {}
+      "]": {}
+      "!": {}
+      "\\": {}
+      vowel: {}
+
 
   substitutions:
     type: object
@@ -20,6 +105,32 @@ properties:
 
   rule-definitions:
     type: object
+    title: Rule definitions
+    description: All the rule definitions that can be used in `rules`.
+    patternProperties:
+      "^([a-z]+-)*[a-z]+$":
+        title: Rule definition
+        description: A rule definition with all the available settings.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^([a-z]+-)*[a-z]+$":
+              title: Rule setting definition
+              description: A definition of rule setting consists of a list of substitutions.
+              type: array
+              items:
+                title: Substitution
+                description: >
+                  A substitution (defined in `substitutions`).
+                  Additionally, to a well-defined substitution name, you can:
+                    * prepend '-' to restrict substitution to prefix position,
+                    * append '-' to restrict substitution to suffix position,
+                    * both append and prepend '-' to restrict substitution to infix.
+                  If you want to run substitutions on demand only, append '*'
+                  (or other metacharacter meaning `change`).
+                type: string
+                pattern: "^-?([a-z]+-)*[a-z]+-?\\*?$"
+                examples: [rule, other-rule, prefix-rule-, only-on-change*, only-on-triple-change***]
 
   presets:
     type: object
@@ -33,6 +144,12 @@ properties:
 
 
 $defs:
+
+  metacharacter:
+    title: "Metacharacter"
+    description: "A character that triggers a modification of the input text according to the rules."
+    type: string
+    maxLength: 1
 
   substitution-name:
     title: "Substitution name"
