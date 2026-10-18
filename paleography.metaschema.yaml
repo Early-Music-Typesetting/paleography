@@ -97,6 +97,16 @@ properties:
 
 
   substitutions:
+    title: Substitutions
+    description: >
+      Definitions of substitutions.
+
+      If possible, should use MUFI "entity" names with the following modifications:
+
+      1) Presence of '-' indicating pre/in/suffix restricts substitution to be used as such.
+
+      2) The "-suffix" indicates additional usage.
+
     type: object
     propertyNames:
       $ref: "#/$defs/substitution-name"
