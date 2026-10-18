@@ -1,4 +1,4 @@
-$schema: "./paleography.schema.yaml"
+$schema: "./paleography.metaschema.yaml"
 
 # TO DO:
 # - 'pattern' must contain a metacharacter.
@@ -8,6 +8,36 @@ $schema: "./paleography.schema.yaml"
 #   substitute(str): /{{str}}/
 #   substitute-except-last(str): /{{str}}(?={{LETTER}})/
 #
+
+regexp-extensions:
+
+  value(property): #"{{v}}"
+    doc: >
+      Allowing insertion of paleo spec's property value into regexp
+      using mustache-like braces and JSON-schema's reference path.
+
+      Property's value needs a check wether it should be escaped
+      (e.g. it can be a special Regex character).
+    argumentPattern: "#/metacharacters/[a-z-]+"
+    evaluation:
+      $ref: property
+    signature: "{{{{property}}}}"
+    example: "{{#/metacharacters/change}}"
+
+  class(characterClassProperty):
+    doc: >
+      Define a POSIX-like class of characters.
+
+      This is needed, because we used various extensions of Unicode
+      that might go beyond typical implementations of '.', '\p{}' etc.
+      For example, MUFI proposes their own Regexp patterns to match
+      all the flavours of a basic graph. See example:
+      https://www.mufi.info/q.php?p=mufi/browse/tag/17
+    argumentPattern: ...
+    evaluation: value(#/character-classes/{{characterClassProperty}})
+    signature: "\\[:{{characterClassProperty}}:\\]"
+    example: "[:*:]"
+
 metacharacters:
 
   change: "*"
@@ -18,26 +48,21 @@ metacharacters:
   expand: "!"
   macro-start: "\\"
 
+character-classes:
 
-classes:
+  "*": "{{#/metacharacters/change}}"
+  "<": "{{#/metacharacters/abbreviate-start}}"
+  ">": "{{#/metacharacters/abbreviate-end}}"
+  "[": "{{#/metacharacters/ommit-start}}"
+  "]": "{{#/metacharacters/abbreviate-end}}"
+  "!": "{{#/metacharacters/expand}}"
+  "\\": "{{#/metacharacters/macro-start}}"
 
-  # TO DO
-  "*": []
-  "<": []
-  ">": []
-  "[": []
-  "]": []
-  "!": []
-  "\\": []
+  # TO DO: add regexp's from MUFI.
   vowel: []
 
 
 substitutions:
-
-  # using MUFI "entity" names
-  # Name should be as close to MUFI as possible.
-  # 1) The "-suffix" indicates additional usage.
-  # 2) Presence of '-' indicating pre/in/suffix restricts substitution to be used as such.
 
   # Final -ꝫ:
   # https://en.wiktionary.org/wiki/ꝫ
@@ -119,33 +144,33 @@ rule-definitions:
   i-dotless:
     always: [inodot]
     indicated: [inodot*]
-    never: null
+    never: []
 
   et-final:
     always: [-etfin-et]
     indicated: [-etfin-et*]
-    never: null
+    never: []
 
   m-final:
     always: [-etfin-m]
     indicated: [-etfin-m*]
-    never: null
+    never: []
 
   nasal:
     always: [nasal]
     indicated: [nasal*]
-    never: null
+    never: []
 
   s-long:
     always: [slong]
     auto: [slong-, -slong-, -slong*]
     indicated: [slong*]
-    never: null
+    never: []
 
   v-round:
     always: [v-round]
     indicated: [v-round*]
-    never: null
+    never: []
 
 
 presets:
