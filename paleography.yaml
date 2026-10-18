@@ -1,5 +1,7 @@
 $schema: "./paleography.metaschema.yaml"
 
+version: "0.3"
+
 # TO DO:
 # - 'pattern' must contain a metacharacter.
 
@@ -7,7 +9,7 @@ $schema: "./paleography.metaschema.yaml"
 #   LETTER: "[]"
 #   substitute(str): /{{str}}/
 #   substitute-except-last(str): /{{str}}(?={{LETTER}})/
-#
+
 
 regexp-extensions:
 

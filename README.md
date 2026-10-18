@@ -97,6 +97,11 @@ A big merit of _Paleography_ is that it separates spelling _directives_ from the
 
 _Paleography can be used as a proxy encoding, allowing for generation of e.g. TEI, font- and platform-specific formats etc.
 
+# Disclaimer
+>[!caution]
+>This readme describes features from before version 0.3.
+>The following section contains deprecated some information. Currently I supply the specification file, providing quick changes and new features. 
+
 ## Example text
 
 Let's demonstrate this with how we may encode the third stanza of _Veri Floris_ conductus in a `.paleo` textfile using _Paleography_ (with the expected unicode rendering):

@@ -4,6 +4,11 @@ $id: paleography
 type: object
 properties:
 
+  version:
+    title: Version
+    description: Version of the Paleography specification.
+    type: string
+
   regexp-extensions:
     title: Regexp extensions
     description: Metasubstitutions for regexp patterns used by this specification.
