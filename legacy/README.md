@@ -5,3 +5,6 @@ This directory contains the original file – a LilyPond engraver (of my creatio
 This project attempts to abstract this into an independent specification.
 
 Many features from this original file are already deprecated. Those deprecations NEED to be included in the specification, because lilypond files using them already exists and the user (me :) ) should be notified about it and not get too surprised.
+
+>[!important]
+> This directory should be removed after all the engraver's features move to the specification.
