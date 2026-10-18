@@ -1,0 +1,243 @@
+$schema: http://json-schema.org/draft/2020-12/schema#
+$id: paleography
+
+type: object
+properties:
+
+  regexp-extensions:
+    title: Regexp extensions
+    description: Metasubstitutions for regexp patterns used by this specification.
+    patternProperties:
+      "[a-z]([a-z])":
+        type: object
+        properties:
+          doc:
+            title: Extention's Description
+            description: String with a documentation of the extension.
+            type: string
+          argumentPattern:
+            title: Argument Pattern
+            type: string
+            format: regex
+          evaluation:
+            title: Extention's Evaluation
+            description: How extension is executed (can use other extensions).
+          signature:
+            title: Signature (within the regex)
+            description: How this extension is realised within a Regex pattern.
+            type: string
+            format: regex
+          example:
+            title: Example call.
+            type: string
+        required: [doc, argumentPattern, evaluation, signature, example]
+        additionalProperties: false
+
+
+  metacharacters:
+    title: Metacharacters
+    description: All the metacharacters used by this specification.
+    type: object
+    properties:
+      change:
+        title: Change
+        description: Metacharacter indicating substitution/abbreviation.
+        $ref: "#/$defs/metacharacter"
+        example: ["*"]
+      abbreviate-start:
+        title: "Abbreviate: start"
+        description: Metacharacter starting contraction
+        $ref: "#/$defs/metacharacter"
+        example: ["<"]
+      abbreviate-end:
+        title: "Abbreviate: end"
+        description: Metacharacter ending contraction
+        $ref: "#/$defs/metacharacter"
+        example: [">"]
+      ommit-start:
+        title: "Ommission: start"
+        description: Metacharacter starting ommission
+        $ref: "#/$defs/metacharacter"
+        example: ["["]
+      ommit-end:
+        title: "Ommission: end"
+        description: Metacharacter ending ommission
+        $ref: "#/$defs/metacharacter"
+        example: ["]"]
+      expand:
+        title: Expand
+        description: This metacharacter tells client to ignore paleographic change/abbreviation/ommission while still allowing to annotate text correctly.
+        $ref: "#/$defs/metacharacter"
+        example: ["!"]
+      macro-start:
+        title: "Macro: start"
+        description: This character introduces macro.
+        $ref: "#/$defs/metacharacter"
+        example: ["\\"]
+    additionalProperties: false
+    required: [change, abbreviate-start, abbreviate-end, ommit-start, ommit-end, expand, macro-start]
+
+  character-classes:
+    type: object
+    title: Character classes
+    description: >
+      Characters defined in this object can be used in `substitution`'s regexp patterns
+      to match and substitute parts of the input text.
+      You can access them using Posix-inspired class syntax: `[:*:]`.
+      _Note_: You must always use the Paleography's default signs.
+    properties:
+      "*": {}
+      "<": {}
+      ">": {}
+      "[": {}
+      "]": {}
+      "!": {}
+      "\\": {}
+      vowel: {}
+
+
+  substitutions:
+    type: object
+    propertyNames:
+      $ref: "#/$defs/substitution-name"
+    additionalProperties:
+      $ref: "#/$defs/substitution"
+
+  rule-definitions:
+    type: object
+    title: Rule definitions
+    description: All the rule definitions that can be used in `rules`.
+    patternProperties:
+      "^([a-z]+-)*[a-z]+$":
+        title: Rule definition
+        description: A rule definition with all the available settings.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^([a-z]+-)*[a-z]+$":
+              title: Rule setting definition
+              description: A definition of rule setting consists of a list of substitutions.
+              type: array
+              items:
+                title: Substitution
+                description: >
+                  A substitution (defined in `substitutions`).
+                  Additionally, to a well-defined substitution name, you can:
+                    * prepend '-' to restrict substitution to prefix position,
+                    * append '-' to restrict substitution to suffix position,
+                    * both append and prepend '-' to restrict substitution to infix.
+                  If you want to run substitutions on demand only, append '*'
+                  (or other metacharacter meaning `change`).
+                type: string
+                pattern: "^-?([a-z]+-)*[a-z]+-?\\*?$"
+                examples: [rule, other-rule, prefix-rule-, only-on-change*, only-on-triple-change***]
+
+  presets:
+    type: object
+
+  rules:
+
+    type: object
+
+    propertyNames:
+      $ref: "#/$defs/rulename"
+
+
+$defs:
+
+  metacharacter:
+    title: "Metacharacter"
+    description: "A character that triggers a modification of the input text according to the rules."
+    type: string
+    maxLength: 1
+
+  substitution-name:
+    title: "Substitution name"
+    description: "Substitution identifier. To restrict the substitution to pre/in/suffix positions, attach '-' before or after (or both) of it."
+    type: string
+    examples: ["rule", "my-rule", "my-prefix-", "-my-infix-", "-my-suffix"]
+    pattern: ^-?([a-z]+-)*[a-z]+-?$
+
+  substitution:
+    type: object
+    title: "Substitution"
+    description: "Substitution properties."
+    $comment: >
+      TO DO 1: backreferences in `unicode` allowed ONLY if `pattern` contains groups.
+      TO DO 2: `pattern` must contain `^` or `$` depending on whether it's name is pre/suffix.
+    properties:
+      class:
+        title: "Substitution Class"
+        description: "Class of substitution."
+        anyOf:
+        - const: allograph
+          description: "A glyph expanding to another (and only 1) glyph."
+        - const: abbreviation
+          description: "A glyph expanding to more than 1 standard letter."
+        - const: contraction
+          description: "A glyph modifier signalising contraction or ommission of letters."
+        - const: mixed
+          description: "A glyph expressing both allograph/abbreviation and contraction."
+        enum: [allograph, abbreviation]
+      pattern:
+        title: Substitution Pattern
+        description: >
+          The pattern that can be used to localise a sequence to substitute.
+          It is a Regex with Posix-inspired class identifiers for paleo's character-classes (using `[:class:]` notation).
+          Such a pattern MUST contain exactly ONE "change" character-class tag: `[:*:]`.
+          The pattern can contain groups `()`.
+        $comment: "TO DO: only none-initial and exactly one [:*:] token should be allowed."
+        type: string
+        format: regex
+        example: ["s[:*:]", "s[:*:](iu)nt", "(\\w)b[:*:]([:vowel:])s"]
+        pattern: ^(?:(?!\[:\*:\]).)*\[:\*:\](?:(?!\[:\*:\]).)*$
+      unicode:
+        title: Unicode
+        description: >
+          Unicode character(s) corresponding to the substitution.
+          If the "pattern" Regex contains groups, you can use backreferences (`\1`, `\2` etc).
+        type: [string, "null"]
+        pattern: (\d*.*)+
+        example: [ſ, ſ\1nt, \1b\2s"]
+      mufi:
+        title: Medieval Unicode Font Initiative Entity name
+        description: >
+          Medieval Unicode Font Initiative Entity name.
+          If MUFI does not contain an entity name, use null.
+        type: [string, "null"]
+      allographs:
+        title: Allographs
+        description: A list of substitution's allographs. The earlier an allograph in the list the more common it is.
+        type: array
+        items:
+          type: string
+    required: [class, pattern, unicode, mufi, allographs]
+    additionalProperties: false
+
+  rulename:
+    title: "Rule name"
+    description: "Rule unique identifier."
+    type: string
+    examples: ["rule", "my-rule"]
+    pattern: ^([a-z]+-)*[a-z]+$
+
+#   rulename-prefix:
+#     type: string
+#     examples: ["prefix-"]
+#     pattern: "-$"
+#
+#   rulename-infix:
+#     type: string
+#     examples: ["-infix-"]
+#     pattern: "^-.+-$"
+#
+#   rulename-suffix:
+#     type: string
+#     examples: ["-suffix-"]
+#     pattern: "^-"
+#
+#   rulename:
+#     anyOf:
+#       - $ref: "#/$defs/rulename-prefix"
+#       - $ref: "#/$defs/rulename-infix"
+#       - $ref: "#/$defs/rulename-suffix"
