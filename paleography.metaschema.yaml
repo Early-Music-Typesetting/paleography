@@ -124,28 +124,9 @@ properties:
     description: All the rule definitions that can be used in `rules`.
     patternProperties:
       "^([a-z]+-)*[a-z]+$":
-        title: Rule definition
-        description: A rule definition with all the available settings.
-        type: object
-        additionalProperties: false
-        patternProperties:
-          "^([a-z]+-)*[a-z]+$":
-              title: Rule setting definition
-              description: A definition of rule setting consists of a list of substitutions.
-              type: array
-              items:
-                title: Substitution
-                description: >
-                  A substitution (defined in `substitutions`).
-                  Additionally, to a well-defined substitution name, you can:
-                    * prepend '-' to restrict substitution to prefix position,
-                    * append '-' to restrict substitution to suffix position,
-                    * both append and prepend '-' to restrict substitution to infix.
-                  If you want to run substitutions on demand only, append '*'
-                  (or other metacharacter meaning `change`).
-                type: string
-                pattern: "^-?([a-z]+-)*[a-z]+-?\\*?$"
-                examples: [rule, other-rule, prefix-rule-, only-on-change*, only-on-triple-change***]
+        oneOf:
+        - $ref: "#/$defs/rule-definition"
+        - $ref: "#/$defs/rule-deprecation"
 
   presets:
     type: object
@@ -239,6 +220,41 @@ $defs:
     type: string
     examples: ["rule", "my-rule"]
     pattern: ^([a-z]+-)*[a-z]+$
+
+  rule-definition:
+    title: Rule definition
+    description: A rule definition with all the available settings.
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^([a-z]+-)*[a-z]+$":
+          title: Rule setting definition
+          description: A definition of rule setting consists of a list of substitutions.
+          type: array
+          items:
+            title: Substitution
+            description: >
+              A substitution (defined in `substitutions`).
+              Additionally, to a well-defined substitution name, you can:
+                * prepend '-' to restrict substitution to prefix position,
+                * append '-' to restrict substitution to suffix position,
+                * both append and prepend '-' to restrict substitution to infix.
+              If you want to run substitutions on demand only, append '*'
+              (or other metacharacter meaning `change`).
+            type: string
+            pattern: "^-?([a-z]+-)*[a-z]+-?\\*?$"
+            examples: [rule, other-rule, prefix-rule-, only-on-change*, only-on-triple-change***]
+
+  rule-deprecation:
+    title: Rule Deprecation
+    description: A deprecated rule telling software to throw error and display a message about rule deprecation and migration.
+    type: object
+    additionalProperties: false
+    properties:
+      deprecated:
+        title: Deprecation Message
+        description: A message containing information about rule deprecation and suggestion for migration.
+        type: string
 
 #   rulename-prefix:
 #     type: string

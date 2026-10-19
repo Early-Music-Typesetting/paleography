@@ -1,6 +1,6 @@
 $schema: "./paleography.metaschema.yaml"
 
-version: "0.3"
+version: "0.3.1"
 
 # TO DO:
 # - 'pattern' must contain a metacharacter.
@@ -68,6 +68,20 @@ character-classes:
 
 
 substitutions:
+
+  christ-x-:
+    class: mixed
+    pattern: ch[:*:]([:<:]?rist.+[:>:]?)
+    unicode: χ\1
+    mufi: null
+    allographs: [x]
+
+  christ-xp-:
+    class: mixed
+    pattern: chr[:*:]([:<:]?ist.+[:>:]?)
+    unicode: χρ\1
+    mufi: null
+    allographs: [xp]
 
   # Final -ꝫ:
   # https://en.wiktionary.org/wiki/ꝫ
@@ -172,14 +186,6 @@ substitutions:
     mufi: null
     allographs: [y]
 
-  # DEPRECATED
-
-  i-initial-capitalized:
-    deprecated: inodotenl
-
-  v-as-u:
-    deprecated: v-round
-
   # u-angled:
 
 rule-definitions:
@@ -188,6 +194,35 @@ rule-definitions:
   # Substitution names can be modified:
   # 1) '-' before, after or both: pre-, in- or suffix.
   # 2) '*' after name: substitution is triggered by 'change' metacharacter.
+
+
+  # christ
+  # que
+  # quem
+  # nasals
+  # er-final
+  # us-final
+  # rum-final
+  # et-final
+  # con
+  # pro
+  # per
+  # ignored-abbreviation
+  # i-abbreviation
+  # abbreviation
+  #
+  #   christi
+  #   C*hr<ist>i
+
+  christ-xp:
+    always: [christ-xp-]
+    indicated: [christ-xp-*]
+    never: []
+
+  christ-x:
+    always: [christ-x-]
+    indicated: [christ-x-*]
+    never: []
 
   i-dotless:
     always: [inodot]
@@ -239,6 +274,19 @@ rule-definitions:
     indicated: [y-dotted-single*]
     never: []
 
+  # DEPRECATED
+
+  christ:
+    deprecated: >
+      For "x" use "christ-x" and mark abbreviation "ch*<rist..>..".
+      For "xp", use "christ-xp" and mark special abbreviation ("chr*<ist..>..").
+
+  i-initial-capitalized:
+    deprecated: use `i-initial-enlarged`
+
+  v-as-u:
+    deprecated: use `v-round`
+
 presets: # TO DO: metaschema
 
   medieval:
@@ -250,6 +298,7 @@ presets: # TO DO: metaschema
   - v-round: always
   - r-rotunda: auto
   - y-dotted: always
+  - christ: indicated
 
   renaissance:
   - s-long: auto
