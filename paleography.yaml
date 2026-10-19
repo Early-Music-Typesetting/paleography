@@ -242,21 +242,21 @@ rule-definitions:
 presets: # TO DO: metaschema
 
   medieval:
-    - i-dotless: always
-    - s-long: auto
-    - et-final: indicated
-    - m-final: indicated
-    - nasal: indicated
-    - v-round: always
-    - r-rotunda: auto
-    - y-dotted: always
+  - i-dotless: always
+  - s-long: auto
+  - et-final: indicated
+  - m-final: indicated
+  - nasal: indicated
+  - v-round: always
+  - r-rotunda: auto
+  - y-dotted: always
 
   renaissance:
-    - s-long: auto
-    - m-final: indicated
-    - nasal: indicated
-    - v-round: always
-    - r-rotunda: auto
+  - s-long: auto
+  - m-final: indicated
+  - nasal: indicated
+  - v-round: always
+  - r-rotunda: auto
 
 
   # insular
