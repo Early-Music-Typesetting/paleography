@@ -60,8 +60,11 @@ character-classes:
   "!": "{{#/metacharacters/expand}}"
   "\\": "{{#/metacharacters/macro-start}}"
 
-  # TO DO: add regexp's from MUFI.
-  vowel: []
+  # TO DO: add regexp's from MUFI for the symbols below:
+  vowel: [aeiouy]
+
+  # TO DO: those should be definiable by font!
+  roudletter: "[obphw]" # Fractur has also "d"
 
 
 substitutions:
@@ -85,7 +88,7 @@ substitutions:
 
   -etfin-ue:
     class: abbreviation
-    pattern: (q)[:*:]ue
+    pattern: q[:*:]ue
     unicode: qꝫ
     mufi: etfin
     allographs: []
@@ -99,7 +102,7 @@ substitutions:
 
   -etfin-us:
     class: abbreviation
-    pattern: (b)[:*:]us
+    pattern: b[:*:]us
     unicode: bꝫ
     mufi: etfin
     allographs: []
@@ -111,12 +114,33 @@ substitutions:
     mufi: inodot
     allographs: [i]
 
+  inodotenl:
+    class: allograph
+    pattern: i[:*:]
+    unicode: null # 
+    mufi: inodotenl
+    allographs: [i]
+
   nasal:
     class: abbreviation
     pattern: ([:vowel:])[:*:][mn]
-    unicode: \1̅ # mufi: bar
+    unicode: \1̅
     mufi: bar
     allographs: []
+
+  rrot:
+    class: allograph
+    pattern: ([:roundletter:])r[:*:]
+    unicode: \1ꝛ
+    mufi: rrot
+    allographs: [r]
+
+  rrot-anywhere:
+    class: allograph
+    pattern: r[:*:]
+    unicode: ꝛ
+    mufi: rrot
+    allographs: [r]
 
   slong:
     class: allograph
@@ -134,6 +158,28 @@ substitutions:
     mufi: null
     allographs: [v]
 
+  y-dotted-doubly:
+    class: allograph
+    pattern: y[:*:]
+    unicode: ÿ # compound. single: ÿ
+    mufi: null
+    allographs: [y]
+
+  y-dotted-single:
+    class: allograph
+    pattern: y[:*:]
+    unicode: ẏ # compound. single: ẏ
+    mufi: null
+    allographs: [y]
+
+  # DEPRECATED
+
+  i-initial-capitalized:
+    deprecated: inodotenl
+
+  v-as-u:
+    deprecated: v-round
+
   # u-angled:
 
 rule-definitions:
@@ -146,6 +192,12 @@ rule-definitions:
   i-dotless:
     always: [inodot]
     indicated: [inodot*]
+    never: []
+
+  i-initial-enlarged:
+    always: [i-enlarged-]
+    auto: [i-enlarged-]
+    indicated: [i-enlarged-*]
     never: []
 
   et-final:
@@ -163,6 +215,12 @@ rule-definitions:
     indicated: [nasal*]
     never: []
 
+  r-rotunda:
+    always: [rrot-anywhere]
+    auto: [rrot]
+    indicated: [rrot-anywhere*]
+    never: []
+
   s-long:
     always: [slong]
     auto: [slong-, -slong-, -slong*]
@@ -174,8 +232,14 @@ rule-definitions:
     indicated: [v-round*]
     never: []
 
+  y-dotted:
+    always-doubly: [y-dotted-doubly]
+    indicated-doubly: [y-dotted-doubly*]
+    always: [y-dotted-single]
+    indicated: [y-dotted-single*]
+    never: []
 
-presets:
+presets: # TO DO: metaschema
 
   medieval:
     - i-dotless: always
@@ -184,12 +248,15 @@ presets:
     - m-final: indicated
     - nasal: indicated
     - v-round: always
+    - r-rotunda: auto
+    - y-dotted: always
 
   renaissance:
     - s-long: auto
     - m-final: indicated
     - nasal: indicated
     - v-round: always
+    - r-rotunda: auto
 
 
   # insular
