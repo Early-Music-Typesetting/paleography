@@ -198,7 +198,6 @@ $defs:
           description: "A glyph modifier signalising contraction or ommission of letters."
         - const: mixed
           description: "A glyph expressing both allograph/abbreviation and contraction."
-        enum: [allograph, abbreviation]
       pattern:
         title: Substitution Pattern
         description: >
