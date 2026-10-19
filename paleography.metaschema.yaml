@@ -168,7 +168,12 @@ $defs:
 
   substitution-name:
     title: "Substitution name"
-    description: "Substitution identifier. To restrict the substitution to pre/in/suffix positions, attach '-' before or after (or both) of it."
+    description: >
+      Substitution identifier. To restrict the substitution to pre/in/suffix positions,
+      attach '-' before or after (or both) of it.".
+
+      Note: because POSIX regex does not support non-capturing groups and other advanced features,
+      it is better to use simpler mechanisms and standard capturing groups.
     type: string
     examples: ["rule", "my-rule", "my-prefix-", "-my-infix-", "-my-suffix"]
     pattern: ^-?([a-z]+-)*[a-z]+-?$
