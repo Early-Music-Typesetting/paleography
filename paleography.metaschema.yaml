@@ -2,6 +2,8 @@ $schema: http://json-schema.org/draft/2020-12/schema#
 $id: paleography
 
 type: object
+additionalProperties: false
+required: [version, regexp-extensions, metacharacters, character-classes, rule-definitions, presets]
 properties:
 
   version:
@@ -100,24 +102,6 @@ properties:
       "\\": {}
       vowel: {}
 
-
-  substitutions:
-    title: Substitutions
-    description: >
-      Definitions of substitutions.
-
-      If possible, should use MUFI "entity" names with the following modifications:
-
-      1) Presence of '-' indicating pre/in/suffix restricts substitution to be used as such.
-
-      2) The "-suffix" indicates additional usage.
-
-    type: object
-    propertyNames:
-      $ref: "#/$defs/substitution-name"
-    additionalProperties:
-      $ref: "#/$defs/substitution"
-
   rule-definitions:
     type: object
     title: Rule definitions
@@ -147,73 +131,6 @@ $defs:
     type: string
     maxLength: 1
 
-  substitution-name:
-    title: "Substitution name"
-    description: >
-      Substitution identifier. To restrict the substitution to pre/in/suffix positions,
-      attach '-' before or after (or both) of it.".
-
-      Note: because POSIX regex does not support non-capturing groups and other advanced features,
-      it is better to use simpler mechanisms and standard capturing groups.
-    type: string
-    examples: ["rule", "my-rule", "my-prefix-", "-my-infix-", "-my-suffix"]
-    pattern: ^-?([a-z]+-)*[a-z]+-?$
-
-  substitution:
-    type: object
-    title: "Substitution"
-    description: "Substitution properties."
-    $comment: >
-      TO DO 1: backreferences in `unicode` allowed ONLY if `pattern` contains groups.
-      TO DO 2: `pattern` must contain `^` or `$` depending on whether it's name is pre/suffix.
-    properties:
-      class:
-        title: "Substitution Class"
-        description: "Class of substitution."
-        anyOf:
-        - const: allograph
-          description: "A glyph expanding to another (and only 1) glyph."
-        - const: abbreviation
-          description: "A glyph expanding to more than 1 standard letter."
-        - const: contraction
-          description: "A glyph modifier signalising contraction or ommission of letters."
-        - const: mixed
-          description: "A glyph expressing both allograph/abbreviation and contraction."
-      pattern:
-        title: Substitution Pattern
-        description: >
-          The pattern that can be used to localise a sequence to substitute.
-          It is a Regex with Posix-inspired class identifiers for paleo's character-classes (using `[:class:]` notation).
-          Such a pattern MUST contain exactly ONE "change" character-class tag: `[:*:]`.
-          The pattern can contain groups `()`.
-        $comment: "TO DO: only none-initial and exactly one [:*:] token should be allowed."
-        type: string
-        format: regex
-        example: ["s[:*:]", "s[:*:](iu)nt", "(\\w)b[:*:]([:vowel:])s"]
-        pattern: ^(?:(?!\[:\*:\]).)*\[:\*:\](?:(?!\[:\*:\]).)*$
-      unicode:
-        title: Unicode
-        description: >
-          Unicode character(s) corresponding to the substitution.
-          If the "pattern" Regex contains groups, you can use backreferences (`\1`, `\2` etc).
-        type: [string, "null"]
-        pattern: (\d*.*)+
-        example: [ſ, ſ\1nt, \1b\2s"]
-      mufi:
-        title: Medieval Unicode Font Initiative Entity name
-        description: >
-          Medieval Unicode Font Initiative Entity name.
-          If MUFI does not contain an entity name, use null.
-        type: [string, "null"]
-      allographs:
-        title: Allographs
-        description: A list of substitution's allographs. The earlier an allograph in the list the more common it is.
-        type: array
-        items:
-          type: string
-    required: [class, pattern, unicode, mufi, allographs]
-    additionalProperties: false
-
   rulename:
     title: "Rule name"
     description: "Rule unique identifier."
@@ -222,34 +139,191 @@ $defs:
     pattern: ^([a-z]+-)*[a-z]+$
 
   rule-definition:
-    title: Rule definition
+    title: Rule Definition
     description: A rule definition with all the available settings.
     type: object
     additionalProperties: false
-    patternProperties:
-      "^([a-z]+-)*[a-z]+$":
-          title: Rule setting definition
-          description: A definition of rule setting consists of a list of substitutions.
-          type: array
-          items:
-            title: Substitution
-            description: >
-              A substitution (defined in `substitutions`).
-              Additionally, to a well-defined substitution name, you can:
-                * prepend '-' to restrict substitution to prefix position,
-                * append '-' to restrict substitution to suffix position,
-                * both append and prepend '-' to restrict substitution to infix.
-              If you want to run substitutions on demand only, append '*'
-              (or other metacharacter meaning `change`).
-            type: string
-            pattern: "^-?([a-z]+-)*[a-z]+-?\\*?$"
-            examples: [rule, other-rule, prefix-rule-, only-on-change*, only-on-triple-change***]
+    required: [description, remarks, examples, class, characters, substitutions, settings]
+    properties:
+      description:
+        title: Rule description
+        description: A short explanatory note about the rule
+        type: string
+      remarks:
+        title: Rule remarks
+        description: Additional commentary on rule's background or implementation.
+        type: string
+      examples:
+        title: Examples
+        description: >
+          Examples of existing documents where the rule might apply
+          containt an example Paleo encoding.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/source-snippet"
+      class:
+        title: Substitution Class
+        description: Class of substitution.
+        anyOf:
+        - const: allograph
+          description: A glyph expanding to another (and only 1) glyph.
+        - const: abbreviation
+          description: A glyph expanding to more than 1 standard letter.
+        - const: contraction
+          description: A glyph modifier signalising contraction or ommission of letters.
+        - const: mixed
+          description: A glyph expressing both allograph/abbreviation and contraction.
+      characters:
+        title: Characters
+        descritpion: Characters used in rule's application.
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [base, char, mufi]
+          properties:
+            base:
+              title: Base Latin character (ASCII)
+              description: Most basic Latin character. It is referred in `substitutions`' `pattern` with `#1` syntax.
+              examples: [a, b, c]
+              $comment: >
+                MUFI sometimes provides a reference for base characters
+                at "Non-PUA / accessibility alternatives" section,
+                however not all characters possess it.
+              type: string
+              minLength: 1
+            char:
+              title: Character
+              description: Character *available* to use provided by MUFI. Usually it's Unicode, but occasionally MUFI points to like PUA.
+              examples: [ꟾ]
+              type: string
+              minLength: 1
+            mufi:
+              title: MUFI entity name
+              description: MUFI entity name
+              examples: [Ilong]
+              type: [string, "null"]
+              minLength: 1
+      substitutions:
+        title: Substitutions
+        description: Substitution performed by the rule application.
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [pattern, result]
+          properties:
+            pattern:
+              title: Pattern
+              description: >
+                Pattern to be matched. It consists of a modified regex:
+
+                * use `#1` to select character.
+                * use capturing group
+                * use custom-defined POSIX-style character classes from `character-classes`.
+                Note: avoid using advanced regex features like non-capturing groups etc. Some implementations (like POSIX) do not support them.
+              type: string
+              format: regex+
+            result:
+              title: Substitution result
+              description: >
+                How the substitution result looks.
+                * use `#1` to select character.
+                * use `\1` to select group (captured in pattern).
+              type: string
+      settings:
+        title: Settings
+        description: A definition of rule setting consists of a list of substitutions.
+        type: object
+        properties:
+          always:
+            title: Substitute always
+            description: Target all pattern matches. If they are marked with `change` metacharacter, do not substitute.
+            $ref: "#/$defs/rule-setting"
+          indicated:
+            title: Substitute indicated
+            description: Target all pattern matches if they have `change` token present.
+            $ref: "#/$defs/rule-setting"
+          auto:
+            title: Substitute automatically
+            description: Perform an automatic substitution based on the most common convention.
+            $ref: "#/$defs/rule-setting"
+          never:
+            title: Never substitute
+            description: Turn substitution off.
+        required: [always, indicated]
+        additionalProperties:
+          $ref: "#/$defs/rule-setting"
+
+  rule-setting:
+    title: Rule Setting
+    description: >
+      How the rule is executed.
+      Contains a list of substitutions (performed in order they appear).
+    type: array
+    minContains: 0
+    items:
+      title: Substitution encoding
+      description: >
+        Evoke substitution defined in `substitutions` using `#1` notation.
+
+        You can further restrict substitution and make it into:
+        * prefix: #1-
+        * infix: -#1-
+        * suffix: -#1
+      $$comment: >
+        Using `^` and `$` directly in the regex is discouraged
+        because the client system can use a more complex buissness logic for determining boundaries.
+
+        For example, (in Lilypond) a word can be sliced by syllables and whether a string contains original word boundary or not needs to determined by other means.
+      examples: ["#1", "#1*", "#2-", "#2-*", "-#3-", "-#4"]
+      type: string
+      pattern: "^-?#\\d+-?\\**$"
+
+  source-snippet:
+    title: Source Snippet
+    description: Description of a relevant place in sources.
+    type: object
+    additionalProperties: false
+    required: [source, link, img, script, paleo]
+    properties:
+      source:
+        title: Source
+        description: Source identifier.
+        type: string
+      link:
+        title: Link
+        description: Link to a source (preferably to the page)
+        type: string
+        format: URL
+      img:
+        title: Image URL
+        description: URL of an image containing relevant source snippet.
+        type: string
+        format: URI
+      script:
+        title: Snippet's script
+        description: What kind of script/font is it.
+        type: string
+        $comment: Add more formalized values.
+      paleo:
+        title: Example of Paleo encoding
+        description: >
+          The Paleo representation of the text from snippet.
+          It must containt only one rule (concerning this snippet)
+          set to `indicated`.
+        type: string
+        pattern: "---\\s*rules:\\s*.+: indicated\\s*---\\s*.+"
 
   rule-deprecation:
     title: Rule Deprecation
     description: A deprecated rule telling software to throw error and display a message about rule deprecation and migration.
     type: object
     additionalProperties: false
+    required: [deprecated]
     properties:
       deprecated:
         title: Deprecation Message

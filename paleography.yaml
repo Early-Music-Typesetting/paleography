@@ -67,134 +67,12 @@ character-classes:
   roudletter: "[obphw]" # Fractur has also "d"
 
 
-substitutions:
-
-  christ-x-:
-    class: mixed
-    pattern: ch[:*:]([:<:]?rist.+[:>:]?)
-    unicode: χ\1
-    mufi: null
-    allographs: [x]
-
-  christ-xp-:
-    class: mixed
-    pattern: chr[:*:]([:<:]?ist.+[:>:]?)
-    unicode: χρ\1
-    mufi: null
-    allographs: [xp]
-
-  # Final -ꝫ:
-  # https://en.wiktionary.org/wiki/ꝫ
-
-  -etfin-et:
-    class: abbreviation
-    pattern: e[:*:]t
-    unicode: ꝫ
-    mufi: etfin
-    allographs: []
-
-  -etfin-est:
-    class: abbreviation
-    pattern: e[:*:]st
-    unicode: ꝫ
-    mufi: etfin
-    allographs: []
-
-  -etfin-ue:
-    class: abbreviation
-    pattern: q[:*:]ue
-    unicode: qꝫ
-    mufi: etfin
-    allographs: []
-
-  -etfin-m:
-    class: allograph
-    pattern: ([aeu])[:*:]m
-    unicode: \1ꝫ
-    mufi: etfin
-    allographs: []
-
-  -etfin-us:
-    class: abbreviation
-    pattern: b[:*:]us
-    unicode: bꝫ
-    mufi: etfin
-    allographs: []
-
-  inodot:
-    class: allograph
-    pattern: i[:*:]
-    unicode: ı
-    mufi: inodot
-    allographs: [i]
-
-  inodotenl:
-    class: allograph
-    pattern: i[:*:]
-    unicode: null # 
-    mufi: inodotenl
-    allographs: [i]
-
-  nasal:
-    class: abbreviation
-    pattern: ([:vowel:])[:*:][mn]
-    unicode: \1̅
-    mufi: bar
-    allographs: []
-
-  rrot:
-    class: allograph
-    pattern: ([:roundletter:])r[:*:]
-    unicode: \1ꝛ
-    mufi: rrot
-    allographs: [r]
-
-  rrot-anywhere:
-    class: allograph
-    pattern: r[:*:]
-    unicode: ꝛ
-    mufi: rrot
-    allographs: [r]
-
-  slong:
-    class: allograph
-    pattern: s[:*:]
-    unicode: ſ
-    mufi: slong
-    allographs: [s]
-
-  # TO DO: final "fancy" curved s.
-
-  v-round:
-    class: allograph
-    pattern: v[:*:]
-    unicode: u
-    mufi: null
-    allographs: [v]
-
-  y-dotted-doubly:
-    class: allograph
-    pattern: y[:*:]
-    unicode: ÿ # compound. single: ÿ
-    mufi: null
-    allographs: [y]
-
-  y-dotted-single:
-    class: allograph
-    pattern: y[:*:]
-    unicode: ẏ # compound. single: ẏ
-    mufi: null
-    allographs: [y]
-
-  # u-angled:
-
 rule-definitions:
 
   # A user interface to macra substitutions.
   # Substitution names can be modified:
   # 1) '-' before, after or both: pre-, in- or suffix.
   # 2) '*' after name: substitution is triggered by 'change' metacharacter.
-
 
   # christ
   # que
@@ -214,65 +92,381 @@ rule-definitions:
   #   christi
   #   C*hr<ist>i
 
+  # Final -ꝫ:
+  # https://en.wiktionary.org/wiki/ꝫ
+
+  # TO DO: final "fancy" curved s.
+  # u-angled:
+
   christ-xp:
-    always: [christ-xp-]
-    indicated: [christ-xp-*]
-    never: []
+    description: Christ- expressed as "chi-rho".
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: mixed # abbreviation? contraction?
+    characters:
+      - base: ch
+        char: χ
+        mufi:
+      - base: r
+        char: ρ
+        mufi:
+    substitutions:
+      - pattern: "#1#2[:*:]([:<:]ist.*[:>:])"
+        result: "#1#2\\1"
+    settings:
+      always: ["#1-"]
+      indicated: ["#1-*"]
+      never: []
 
   christ-x:
-    always: [christ-x-]
-    indicated: [christ-x-*]
-    never: []
-
-  i-dotless:
-    always: [inodot]
-    indicated: [inodot*]
-    never: []
-
-  i-initial-enlarged:
-    always: [i-enlarged-]
-    auto: [i-enlarged-]
-    indicated: [i-enlarged-*]
-    never: []
+    description: Christ- expressed as "chi" alone.
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: mixed # abbreviation? contraction?
+    characters:
+      - base: ch
+        char: χ
+        mufi:
+    substitutions:
+      - pattern: "#1[:*:]([:<:]rist.*[:>:])"
+        result: "#1\\1"
+    settings:
+      always: ["#1-"]
+      indicated: ["#1-*"]
+      never: []
 
   et-final:
-    always: [-etfin-et]
-    indicated: [-etfin-et*]
-    never: []
+    description: Final "et"
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base: et
+        char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: e[:*:]t
+        result: "#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  est-final:
+    description: Final "est"
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base: est
+        char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: e[:*:]st
+        result: "#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  que-final:
+    description: Final "que"
+    remarks: >
+      TO DO: verify whether it is only in final position.
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base: que
+        char: qꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: q[:*:]ue
+        result: "#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  bus-final:
+    description: Final "-bus"
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base: us
+        char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: b[:*:]us
+        result: "b#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  onem-final:
+    description: Final "-onem"
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base: em
+        char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: on[:*:]em
+        result: "on#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  # to do:
+  # tittle:
+  # - dot
+  # - slash (ILVB 158 etc)
+  # - absent
+  i-dotless:
+    description: A small 'i' without a dot (tittle).
+    remarks: >
+      Many scripts do not provide a dot (tittle) over i.
+    examples: []
+    class: allograph
+    characters:
+    - { base: i, char: ı, mufi: inodot }
+    substitutions:
+    - pattern: "#1[:*:]"
+      result: "#1"
+    settings:
+      always: ["#1"]
+      indicated: ["#1*"]
+      never: []
+
+  # inodot:
+  #   class: allograph
+  #   pattern: i[:*:]
+  #   unicode: ı
+  #   mufi: inodot
+  #   allographs: [i]
+
+  i-initial-enlarged:
+    description: Initial small "i" enlarges.
+    remarks: >
+      It is not yet clear wether this character should be represented
+      by Unicode/MUFI "epigraphic I longa" `ꟾ`
+      or MUFI's "enlarged small dotless i" ``.
+
+      Wikipedia hints for Long_I, but only for late Roman and early medieval scripts: ttps://en.wikipedia.org/wiki/Long_I
+      Examples contain an early XVI c. bastarda / fraktur (???) script from ILVB 158.
+    examples:
+    - source: ILVB 158
+      link: ...
+      img: ...
+      script: ...
+      paleo: >
+        ---
+        rules:
+          i-initial-enlarged: indicated
+        ---
+        ...
+    class: allograph
+    characters:
+    - { base: i, char: ꟾ, mufi: Ilong }
+    - { base: i, char: , mufi: inodotenl }
+    substitutions:
+    - pattern: "#1[:*:]"
+      result: "#1"
+    settings:
+      always: ["#1-"]
+      indicated: [prefix*]
 
   m-final:
-    always: [-etfin-m]
-    indicated: [-etfin-m*]
-    never: []
+    description: Final "m".
+    remarks: >
+      Usually final "-am", "-em" or "-um".
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: allograph
+    characters:
+      - base: m
+        char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: "([:vowel:])#1[:*:]"
+        result: "#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
 
   nasal:
-    always: [nasal]
-    indicated: [nasal*]
-    never: []
+    description: Nasal stroke
+    remarks: >
+      This is one of the most common scriptural abbreviation.
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: abbreviation
+    characters:
+      - base:
+        char: ̅
+        mufi: bar
+    substitutions:
+      - pattern: ([:vowel:])[:*:][mn]
+        result: \1#1
+    settings:
+      always: ["#1"]
+      indicated: ["#1"]
+      never: []
 
   r-rotunda:
-    always: [rrot-anywhere]
-    auto: [rrot]
-    indicated: [rrot-anywhere*]
-    never: []
+    description: Variant of 'r' before "round" letters.
+    remarks: >
+      Different types have different definitions of what a "round" letter is.
+      For gothic scripts its "o", "b", "p", "h", "w".
+      Fraktur also has round "d"
+    examples: []
+    class: allograph
+    characters:
+      - base: r
+        char: ꝛ
+        mufi: rrot
+    substitutions:
+      - pattern: ([[:roundletter:]])#1
+        result: \1#1
+      - pattern: "#1"
+        result: "#1"
+    settings:
+      always: ["#2"]
+      auto: ["#1"]
+      indicated: ["#1*"]
+      never: []
 
   s-long:
-    always: [slong]
-    auto: [slong-, -slong-, -slong*]
-    indicated: [slong*]
-    never: []
+    description: Long s
+    remarks: >
+      This is the prevailing variant of small s in old scripts.
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: allograph
+    characters:
+      - base: s
+        char: ſ
+        mufi: slong
+    substitutions:
+      - pattern: "#1[:*:]"
+        result: "#1"
+    settings:
+      always: ["#1"]
+      auto: ["#1-", "-#1-", "-#1*"]
+      indicated: ["#1*"]
+      never: []
 
   v-round:
-    always: [v-round]
-    indicated: [v-round*]
-    never: []
+    description: Round variant of "v".
+    remarks: >
+      Most old scripts do not distinguish between "v" and "u"
+      (in a similar way that some modern Latin conventions do not distinguish between "i" and "j").
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: allograph
+    characters:
+      - base: v
+        char: u
+        mufi: null
+    substitutions:
+      - pattern: "#1[:*:]"
+        result: "#1"
+    settings:
+      always: ["#1"]
+      indicated: ["#1*"]
+      never: []
 
   y-dotted:
-    always-doubly: [y-dotted-doubly]
-    indicated-doubly: [y-dotted-doubly*]
-    always: [y-dotted-single]
-    indicated: [y-dotted-single*]
-    never: []
+    # always-doubly: [y-dotted-doubly]
+    # indicated-doubly: [y-dotted-doubly*]
+    # always: [y-dotted-single]
+    # indicated: [y-dotted-single*]
+    # never: []
+    description: Dots over "y".
+    remarks: >
+    examples:
+      - source:
+        link:
+        img:
+        script:
+        paleo:
+    class: allograph
+    characters:
+      - base: y
+        char: ẏ # compound. single: ẏ
+        mufi:
+      - base: y
+        char: ÿ # compound. single: ÿ
+        mufi:
+    substitutions:
+      - pattern: y[:*:]
+        result: "#1"
+      - pattern: y[:*:]
+        result: "#2"
+    settings:
+      always-single: ["#1"]
+      indicated-single: ["#1*"]
+      always-double: ["#2"]
+      indicated-double: ["#2"]
+      auto: ["#2**", "#1*"]
+      never: []
 
   # DEPRECATED
 
