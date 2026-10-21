@@ -1,88 +1,171 @@
+%YAML 1.2
+---
 $schema: http://json-schema.org/draft/2020-12/schema#
 $id: paleography
 
+title: paleography.metaschema.yaml
+description: >
+  ...
+
 type: object
 additionalProperties: false
-required: [version, regexp-extensions, metacharacters, character-classes, rule-definitions, presets]
+required: [$schema, version, yaml-extensions, regex-extensions, tokens, character-classes, rule-definitions, presets]
 properties:
+
+  $schema:
+    $ref: '#/$defs/schema'
 
   version:
     title: Version
     description: Version of the Paleography specification.
+    examples: [0.5.1]
     type: string
+    pattern: '\d+\.\d+\.\d+'
 
-  regexp-extensions:
-    title: Regexp extensions
-    description: Metasubstitutions for regexp patterns used by this specification.
-    patternProperties:
-      "[a-z]([a-z])":
-        type: object
-        properties:
-          doc:
-            title: Extention's Description
-            description: String with a documentation of the extension.
-            type: string
-          argumentPattern:
-            title: Argument Pattern
-            type: string
-            format: regex
-          evaluation:
-            title: Extention's Evaluation
-            description: How extension is executed (can use other extensions).
-          signature:
-            title: Signature (within the regex)
-            description: How this extension is realised within a Regex pattern.
-            type: string
-            format: regex
-          example:
-            title: Example call.
-            type: string
-        required: [doc, argumentPattern, evaluation, signature, example]
-        additionalProperties: false
+  yaml-extensions:
+    title: YAML extensions
+    description: >
+      Special keys informing Paleography client of additional YAML-transformation routines.
 
-
-  metacharacters:
-    title: Metacharacters
-    description: All the metacharacters used by this specification.
+      User is restricted from implementing their own "YAML extensions".
     type: object
+    additionalProperties: false
+    required: [$schema]
+    properties:
+
+      $schema:
+        title: JSON Schema
+        description: >
+          Entry point for the Schema validation. See: https://json-schema.org/draft/2020-12/json-schema-core#name-the-schema-keyword
+        additionalProperties: false
+        required: [const]
+        properties:
+          const:
+            $ref: '#/$defs/schema'
+
+  regex-extensions:
+    title: Regex extensions
+    description: >
+      Additional syntax used in templating regex formulas.
+
+      Those extensions needs to be implemented by client
+      and matched over `pattern` fields.
+
+      NOTE: those extensions are additionally enforced by the metaschema
+      and should reflect values defined in metaschema.
+    type: object
+    additionalProperties:
+      $ref: '#/$defs/regex-extension'
+    required: [paleo-class, mufi-char, token-char, definition-ref, group-ref]
+    properties:
+      paleo-class:
+        title: Paleo character class
+        description: >
+          POSIX-inspired character class syntax defined in Paleo or by user.
+
+          It allows to provide a shortcut to custom-defined
+          character regex classes (such as MUFI's character classes).
+        examples: ['[:myclass:]']
+        $ref: '#/$defs/regex-extension'
+        properties:
+          pattern:
+            type: string
+            format: regex
+            const: '\[:([a-z]+|\*+|\<|\>|\[|\]|!|\\):\]'
+
+      mufi-char:
+        title: MUFI character class
+        description: >
+          A character class defined as tag in MUFI
+          containing a regex pattern for the whole tag's content match.
+        examples: ['\m{R}', '\m{Greek}', '\m{- abbr}']
+        $ref: '#/$defs/regex-extension'
+        properties:
+          pattern:
+            type: string
+            format: regex
+            const: '\m{([A-Z]|- )[a-z]*}'
+
+      token-char:
+        title: Paleo token character class
+        description: >
+          Recall character representing Paleo's token.
+
+          User can set their own characters as token's.
+          This functionality ensures that this user's intervention
+          is always reflected in Paleo's rule-definitions regex templating.
+        examples: ['\t{change}']
+        $ref: '#/$defs/regex-extension'
+        properties:
+          pattern:
+            title: Paleo token character class regex extension pattern.
+            description: >
+              This pattern MUST contain all the tokens defined in '#/properties/tokens'.
+            type: string
+            format: regex
+            const:  \t{(change|abbreviate-start|abbreviate-end|ommit-start|ommit-end|expand|macro-start)}
+
+      definition-ref:
+        title: List item reference
+        description: >
+          Insert an elsewhere-defined subpattern into pattern by it's index (1-based).
+        examples: ['#1']
+        $ref: '#/$defs/regex-extension'
+        properties:
+          pattern:
+            const: '#\d+'
+
+      group-ref:
+        title: Regex captured group reference
+        description: >
+          Insert result of a regex capture group match into string.
+        $ref: '#/$defs/regex-extension'
+        properties:
+          pattern:
+            const: '\\d+'
+
+  tokens:
+    title: Tokens
+    description: All the special tokens defined by this specification.
+    type: object
+    additionalProperties: false
+    required: [change, abbreviate-start, abbreviate-end, ommit-start, ommit-end, expand, macro-start]
     properties:
       change:
         title: Change
-        description: Metacharacter indicating substitution/abbreviation.
-        $ref: "#/$defs/metacharacter"
-        example: ["*"]
+        description: Token indicating substitution/abbreviation.
+        $ref: '#/$defs/token'
+        example: ['*']
       abbreviate-start:
-        title: "Abbreviate: start"
-        description: Metacharacter starting contraction
-        $ref: "#/$defs/metacharacter"
-        example: ["<"]
+        title: 'Abbreviate: start'
+        description: Token starting abbreviation
+        $ref: '#/$defs/token'
+        example: ['<']
       abbreviate-end:
-        title: "Abbreviate: end"
-        description: Metacharacter ending contraction
-        $ref: "#/$defs/metacharacter"
-        example: [">"]
+        title: 'Abbreviate: end'
+        description: Token ending abbreviation
+        $ref: '#/$defs/token'
+        example: ['>']
       ommit-start:
-        title: "Ommission: start"
-        description: Metacharacter starting ommission
-        $ref: "#/$defs/metacharacter"
-        example: ["["]
+        title: 'Ommission: start'
+        description: Token starting ommission
+        $ref: '#/$defs/token'
+        example: ['[']
       ommit-end:
-        title: "Ommission: end"
-        description: Metacharacter ending ommission
-        $ref: "#/$defs/metacharacter"
-        example: ["]"]
+        title: 'Ommission: end'
+        description: Token ending ommission
+        $ref: '#/$defs/token'
+        example: [']']
       expand:
         title: Expand
-        description: This metacharacter tells client to ignore paleographic change/abbreviation/ommission while still allowing to annotate text correctly.
-        $ref: "#/$defs/metacharacter"
-        example: ["!"]
+        description: This token tells client to ignore paleographic change/abbreviation/ommission while still allowing to annotate text correctly.
+        $ref: '#/$defs/token'
+        example: ['!']
       macro-start:
-        title: "Macro: start"
+        title: 'Macro: start'
         description: This character introduces macro.
-        $ref: "#/$defs/metacharacter"
-        example: ["\\"]
-    additionalProperties: false
-    required: [change, abbreviate-start, abbreviate-end, ommit-start, ommit-end, expand, macro-start]
+        $ref: '#/$defs/token'
+        example: [\]
 
   character-classes:
     type: object
@@ -91,7 +174,17 @@ properties:
       Characters defined in this object can be used in `substitution`'s regexp patterns
       to match and substitute parts of the input text.
       You can access them using Posix-inspired class syntax: `[:*:]`.
-      _Note_: You must always use the Paleography's default signs.
+
+      NOT: You must always use the Paleography's default signs.
+    required:
+      - '*'
+      - <
+      - '>'
+      - '['
+      - ']'
+      - '!'
+      - \
+      - vowel
     properties:
       "*": {}
       "<": {}
@@ -125,9 +218,35 @@ properties:
 
 $defs:
 
-  metacharacter:
-    title: "Metacharacter"
-    description: "A character that triggers a modification of the input text according to the rules."
+  regex-extension:
+    title: Regex extension
+    description: >
+      Additional regex syntax features allowing pattern templating.
+    type: object
+    additionalProperties: false
+    required: [pattern]
+    properties:
+      pattern:
+        title: Regex extension pattern
+        description: Regex pattern used to match the extension syntax in regex template.
+        type: string
+
+  schema:
+    title: JSON Schema ID.
+    description: ID of JSON Schema this file complies to.
+    type: string
+    const: './paleography.metaschema.yaml'
+
+  ref:
+    title: Reference URI pattern
+    description: >
+      Only referencing specification tokens and MUFI is allowed.
+    type: string
+    const: '(#/tokens|MUFI)(/[a-z]+)+'
+
+  token:
+    title: Token
+    description: A character that triggers a modification of the input text according to the rules.
     type: string
     maxLength: 1
 
@@ -136,7 +255,7 @@ $defs:
     description: "Rule unique identifier."
     type: string
     examples: ["rule", "my-rule"]
-    pattern: ^([a-z]+-)*[a-z]+$
+    pattern: '^([a-z]+-)*[a-z]+$'
 
   rule-definition:
     title: Rule Definition
@@ -238,23 +357,22 @@ $defs:
         title: Settings
         description: A definition of rule setting consists of a list of substitutions.
         type: object
-        properties:
-          always:
+        patternProperties:
+          $always(-[a-z])+:
             title: Substitute always
-            description: Target all pattern matches. If they are marked with `change` metacharacter, do not substitute.
+            description: Target all pattern matches. If they are marked with `change` token, do not substitute.
             $ref: "#/$defs/rule-setting"
-          indicated:
+          indicated(-[a-z])+:
             title: Substitute indicated
             description: Target all pattern matches if they have `change` token present.
             $ref: "#/$defs/rule-setting"
-          auto:
+          auto(-[a-z])+:
             title: Substitute automatically
             description: Perform an automatic substitution based on the most common convention.
             $ref: "#/$defs/rule-setting"
           never:
             title: Never substitute
             description: Turn substitution off.
-        required: [always, indicated]
         additionalProperties:
           $ref: "#/$defs/rule-setting"
 
@@ -281,7 +399,7 @@ $defs:
         For example, (in Lilypond) a word can be sliced by syllables and whether a string contains original word boundary or not needs to determined by other means.
       examples: ["#1", "#1*", "#2-", "#2-*", "-#3-", "-#4"]
       type: string
-      pattern: "^-?#\\d+-?\\**$"
+      pattern: '^-?#\d+-?\**$'
 
   source-snippet:
     title: Source Snippet
@@ -316,19 +434,32 @@ $defs:
           It must containt only one rule (concerning this snippet)
           set to `indicated`.
         type: string
-        pattern: "---\\s*rules:\\s*.+: indicated\\s*---\\s*.+"
+        pattern: '---\s*rules:\s*.+: indicated\s*---\s*.+'
 
   rule-deprecation:
     title: Rule Deprecation
-    description: A deprecated rule telling software to throw error and display a message about rule deprecation and migration.
+    description: A deprecated rule telling software how to migrate or to throw error.
     type: object
     additionalProperties: false
-    required: [deprecated]
+    required: [deprecated, remarks, version, target]
     properties:
       deprecated:
-        title: Deprecation Message
-        description: A message containing information about rule deprecation and suggestion for migration.
+        title: Deprecarted flag
+        description: "`true` if rule definition is deprecated."
+      remarks:
+        title: Remarks
+        description: Additional migration remarks.
+      version:
+        title: Deprecation Version
+        description: Version since the feature became deprecated.
         type: string
+        pattern: '\d+\.\d+\.\d+'
+      target:
+        title: Migration target
+        description: Rule definition telling client which rule to use instead (null if migration is not possible).
+        type: [string, "null"]
+        pattern: '^-?([a-z]+-)*[a-z]+-?$'
+
 
 #   rulename-prefix:
 #     type: string

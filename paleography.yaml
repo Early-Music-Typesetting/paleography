@@ -1,71 +1,55 @@
-$schema: "./paleography.metaschema.yaml"
+%YAML 1.2
+---
+$schema: './paleography.metaschema.yaml'
 
-version: "0.3.1"
+version: "0.5.1"
 
-# TO DO:
-# - 'pattern' must contain a metacharacter.
+yaml-extensions:
 
+  $schema:
+    const: './paleography.metaschema.yaml'
 
-#   LETTER: "[]"
-#   substitute(str): /{{str}}/
-#   substitute-except-last(str): /{{str}}(?={{LETTER}})/
+regex-extensions:
 
+  paleo-class:
+    pattern: '\[:([a-z]+|\*+|\<|\>|\[|\]|!|\\):\]'
 
-regexp-extensions:
+  mufi-char:
+    pattern: '\m{([A-Z]|- )[a-z]*}'
 
-  value(property): #"{{v}}"
-    doc: >
-      Allowing insertion of paleo spec's property value into regexp
-      using mustache-like braces and JSON-schema's reference path.
+  token-char:
+    pattern: \t{(change|abbreviate-start|abbreviate-end|ommit-start|ommit-end|expand|macro-start)}
 
-      Property's value needs a check wether it should be escaped
-      (e.g. it can be a special Regex character).
-    argumentPattern: "#/metacharacters/[a-z-]+"
-    evaluation:
-      $ref: property
-    signature: "{{{{property}}}}"
-    example: "{{#/metacharacters/change}}"
+  definition-ref:
+    pattern: '#\d+'
 
-  class(characterClassProperty):
-    doc: >
-      Define a POSIX-like class of characters.
+  group-ref:
+    pattern: '\\d+'
 
-      This is needed, because we used various extensions of Unicode
-      that might go beyond typical implementations of '.', '\p{}' etc.
-      For example, MUFI proposes their own Regexp patterns to match
-      all the flavours of a basic graph. See example:
-      https://www.mufi.info/q.php?p=mufi/browse/tag/17
-    argumentPattern: ...
-    evaluation: value(#/character-classes/{{characterClassProperty}})
-    signature: "\\[:{{characterClassProperty}}:\\]"
-    example: "[:*:]"
-
-metacharacters:
-
-  change: "*"
-  abbreviate-start: "<"
-  abbreviate-end: ">"
-  ommit-start: "["
-  ommit-end: "]"
-  expand: "!"
-  macro-start: "\\"
+tokens:
+  change: '*'
+  abbreviate-start:  '<'
+  abbreviate-end: '>'
+  ommit-start: '['
+  ommit-end: ']'
+  expand: '!'
+  macro-start: '\'
 
 character-classes:
 
-  "*": "{{#/metacharacters/change}}"
-  "<": "{{#/metacharacters/abbreviate-start}}"
-  ">": "{{#/metacharacters/abbreviate-end}}"
-  "[": "{{#/metacharacters/ommit-start}}"
-  "]": "{{#/metacharacters/abbreviate-end}}"
-  "!": "{{#/metacharacters/expand}}"
-  "\\": "{{#/metacharacters/macro-start}}"
+  '*': \t{change}
+  '<': \t{abbreviate-start}
+  '>': \t{abbreviate-end}
+  '[': \t{ommit-start}
+  ']': \t{abbreviate-end}
+  '!': \t{expand}
+  '\': \t{macro-start}
 
   # TO DO: add regexp's from MUFI for the symbols below:
-  vowel: [aeiouy]
+  vowel: '[\m{A}\m{E}\m{I}\m{O}\m{U}\m{Y}]'
 
   # TO DO: those should be definiable by font!
-  roudletter: "[obphw]" # Fractur has also "d"
-
+  roudletter: '[\m{O}\m{B}\m{P}\m{H}\m{W}]' # Fractur has also "d"
 
 rule-definitions:
 
@@ -74,49 +58,43 @@ rule-definitions:
   # 1) '-' before, after or both: pre-, in- or suffix.
   # 2) '*' after name: substitution is triggered by 'change' metacharacter.
 
-  # christ
-  # que
   # quem
-  # nasals
-  # er-final
-  # us-final
   # rum-final
-  # et-final
-  # con
   # pro
   # per
   # ignored-abbreviation
   # i-abbreviation
   # abbreviation
-  #
-  #   christi
-  #   C*hr<ist>i
 
-  # Final -ꝫ:
-  # https://en.wiktionary.org/wiki/ꝫ
-
-  # TO DO: final "fancy" curved s.
+  # TO DO: final "fancy" curved s. – as "enlarged S"
   # u-angled:
+
+  bus-final:
+    description: Final "-bus"
+    remarks: >
+    examples: []
+    class: abbreviation
+    characters:
+      - char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: b[:*:]us
+        result: "b#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
 
   christ-xp:
     description: Christ- expressed as "chi-rho".
     remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: mixed # abbreviation? contraction?
     characters:
-      - base: ch
-        char: χ
-        mufi:
-      - base: r
-        char: ρ
-        mufi:
+      - char: χ
+      - char: ρ
     substitutions:
-      - pattern: "#1#2[:*:]([:<:]ist.*[:>:])"
+      - pattern: "chr[:*:]([:<:]ist.*[:>:])"
         result: "#1#2\\1"
     settings:
       always: ["#1-"]
@@ -126,20 +104,34 @@ rule-definitions:
   christ-x:
     description: Christ- expressed as "chi" alone.
     remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: mixed # abbreviation? contraction?
     characters:
-      - base: ch
-        char: χ
-        mufi:
+      - char: χ
     substitutions:
-      - pattern: "#1[:*:]([:<:]rist.*[:>:])"
+      - pattern: "ch[:*:]([:<:]rist.*[:>:])"
         result: "#1\\1"
+    settings:
+      always: ["#1-"]
+      indicated: ["#1-*"]
+      never: []
+
+  con-initial:
+    description: initial "con" or "com"
+    remarks:  >
+      There are a few ways initial "con" is abbreviated:
+        - `ꝯ` – most typical.
+        - `ↄ` – reversed "c" (with or without dot inside)
+        - `ɔ` – open `o`. NOTE: MUFI allows it, but reccomends to use "reversed c" instead.
+    examples: []
+    class: abbreviation
+    characters:
+      - base:
+        char: [ꝯ, ↄ, ꜿ]
+        mufi: [condes, conbase, condot]
+    substitutions:
+      - pattern: c[:*:]o[mn]
+        result: "#1"
     settings:
       always: ["#1-"]
       indicated: ["#1-*"]
@@ -148,16 +140,10 @@ rule-definitions:
   et-final:
     description: Final "et"
     remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: abbreviation
     characters:
-      - base: et
-        char: ꝫ
+      - char: ꝫ
         mufi: etfin
     substitutions:
       - pattern: e[:*:]t
@@ -170,87 +156,14 @@ rule-definitions:
   est-final:
     description: Final "est"
     remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: abbreviation
     characters:
-      - base: est
-        char: ꝫ
+      - char: ꝫ
         mufi: etfin
     substitutions:
       - pattern: e[:*:]st
         result: "#1"
-    settings:
-      always: ["-#1"]
-      indicated: ["-#1*"]
-      never: []
-
-  que-final:
-    description: Final "que"
-    remarks: >
-      TO DO: verify whether it is only in final position.
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
-    class: abbreviation
-    characters:
-      - base: que
-        char: qꝫ
-        mufi: etfin
-    substitutions:
-      - pattern: q[:*:]ue
-        result: "#1"
-    settings:
-      always: ["-#1"]
-      indicated: ["-#1*"]
-      never: []
-
-  bus-final:
-    description: Final "-bus"
-    remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
-    class: abbreviation
-    characters:
-      - base: us
-        char: ꝫ
-        mufi: etfin
-    substitutions:
-      - pattern: b[:*:]us
-        result: "b#1"
-    settings:
-      always: ["-#1"]
-      indicated: ["-#1*"]
-      never: []
-
-  onem-final:
-    description: Final "-onem"
-    remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
-    class: abbreviation
-    characters:
-      - base: em
-        char: ꝫ
-        mufi: etfin
-    substitutions:
-      - pattern: on[:*:]em
-        result: "on#1"
     settings:
       always: ["-#1"]
       indicated: ["-#1*"]
@@ -268,7 +181,7 @@ rule-definitions:
     examples: []
     class: allograph
     characters:
-    - { base: i, char: ı, mufi: inodot }
+    - { char: ı, mufi: inodot }
     substitutions:
     - pattern: "#1[:*:]"
       result: "#1"
@@ -293,11 +206,13 @@ rule-definitions:
 
       Wikipedia hints for Long_I, but only for late Roman and early medieval scripts: ttps://en.wikipedia.org/wiki/Long_I
       Examples contain an early XVI c. bastarda / fraktur (???) script from ILVB 158.
+
+      As of MUFI 3.0, "enlarged small dotless i" is not a part of unicode, thus we recommend using the "epigraphic" i until it's included.
     examples:
     - source: ILVB 158
-      link: ...
-      img: ...
-      script: ...
+      # link: ...
+      # img: ...
+      # script: ...
       paleo: >
         ---
         rules:
@@ -306,29 +221,23 @@ rule-definitions:
         ...
     class: allograph
     characters:
-    - { base: i, char: ꟾ, mufi: Ilong }
-    - { base: i, char: , mufi: inodotenl }
+      - char: [ꟾ, ]
+        mufi: [Ilong, inodotenl]
     substitutions:
     - pattern: "#1[:*:]"
       result: "#1"
     settings:
       always: ["#1-"]
-      indicated: [prefix*]
+      indicated: ["#1-*"]
 
   m-final:
     description: Final "m".
     remarks: >
       Usually final "-am", "-em" or "-um".
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: allograph
     characters:
-      - base: m
-        char: ꝫ
+      - char: ꝫ
         mufi: etfin
     substitutions:
       - pattern: "([:vowel:])#1[:*:]"
@@ -338,28 +247,54 @@ rule-definitions:
       indicated: ["-#1*"]
       never: []
 
-
   nasal:
     description: Nasal stroke
     remarks: >
       This is one of the most common scriptural abbreviation.
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: abbreviation
     characters:
-      - base:
-        char: ̅
+      - char: ̅
         mufi: bar
     substitutions:
       - pattern: ([:vowel:])[:*:][mn]
         result: \1#1
     settings:
       always: ["#1"]
-      indicated: ["#1"]
+      indicated: ["#1*"]
+      never: []
+
+  onem-final:
+    description: Final "-onem"
+    remarks: >
+    examples: []
+    class: abbreviation
+    characters:
+      - char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: on[:*:]em
+        result: "on#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
+      never: []
+
+  que-final:
+    description: Final "que"
+    remarks: >
+      TO DO: verify whether it is only in final position.
+    examples: []
+    class: abbreviation
+    characters:
+      - char: ꝫ
+        mufi: etfin
+    substitutions:
+      - pattern: q[:*:]ue
+        result: "q#1"
+    settings:
+      always: ["-#1"]
+      indicated: ["-#1*"]
       never: []
 
   r-rotunda:
@@ -371,8 +306,7 @@ rule-definitions:
     examples: []
     class: allograph
     characters:
-      - base: r
-        char: ꝛ
+      - char: ꝛ
         mufi: rrot
     substitutions:
       - pattern: ([[:roundletter:]])#1
@@ -389,16 +323,10 @@ rule-definitions:
     description: Long s
     remarks: >
       This is the prevailing variant of small s in old scripts.
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: allograph
     characters:
-      - base: s
-        char: ſ
+      - char: ſ
         mufi: slong
     substitutions:
       - pattern: "#1[:*:]"
@@ -409,24 +337,35 @@ rule-definitions:
       indicated: ["#1*"]
       never: []
 
+  us-final:
+    description: Final -us or -er (ending of nominative 2nd declention)
+    remarks: >
+    examples: []
+    class: abbreviation
+    characters:
+      - char: ꝰ
+        mufi: usmod
+    substitutions:
+      - pattern: u[:*:]s
+        result: "#1"
+      - pattern: e[:*:]r
+        result: "#1"
+    settings:
+      always: ["-#1", "-#2"]
+      indicated: ["-#1*", "-#2*"]
+
   v-round:
     description: Round variant of "v".
     remarks: >
       Most old scripts do not distinguish between "v" and "u"
       (in a similar way that some modern Latin conventions do not distinguish between "i" and "j").
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: allograph
     characters:
-      - base: v
-        char: u
+      - char: u
         mufi: null
     substitutions:
-      - pattern: "#1[:*:]"
+      - pattern: "v[:*:]"
         result: "#1"
     settings:
       always: ["#1"]
@@ -441,20 +380,11 @@ rule-definitions:
     # never: []
     description: Dots over "y".
     remarks: >
-    examples:
-      - source:
-        link:
-        img:
-        script:
-        paleo:
+    examples: []
     class: allograph
     characters:
-      - base: y
-        char: ẏ # compound. single: ẏ
-        mufi:
-      - base: y
-        char: ÿ # compound. single: ÿ
-        mufi:
+      - char: ẏ # compound. single: ẏ
+      - char: ÿ # compound. single: ÿ
     substitutions:
       - pattern: y[:*:]
         result: "#1"
@@ -471,17 +401,27 @@ rule-definitions:
   # DEPRECATED
 
   christ:
-    deprecated: >
+    deprecated: true
+    remarks: >
       For "x" use "christ-x" and mark abbreviation "ch*<rist..>..".
       For "xp", use "christ-xp" and mark special abbreviation ("chr*<ist..>..").
+    version: 0.4.0
+    target: null
 
   i-initial-capitalized:
-    deprecated: use `i-initial-enlarged`
+    deprecated: true
+    remarks: use `i-initial-enlarged`
+    version: 0.4.0
+    target: i-initial-enlarged
 
   v-as-u:
-    deprecated: use `v-round`
+    deprecated: true
+    remarks: use `v-round`
+    version: 0.4.0
+    target: v-round
 
-presets: # TO DO: metaschema
+
+presets: # TO DO: metaschema, update.
 
   medieval:
   - i-dotless: always
@@ -504,5 +444,5 @@ presets: # TO DO: metaschema
 
   # insular
 
-fonts:
-  ...
+# fonts:
+  # ...
