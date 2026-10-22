@@ -2,7 +2,11 @@
 ---
 $schema: './paleography.metaschema.yaml'
 
-version: 0.7.0
+version: 0.8.0
+
+mufi-snapshot:
+  url: https://mufi.info/q.php?q=mufiexport
+  date: 0000-00-00
 
 regex-extensions:
 
@@ -333,11 +337,6 @@ rule-definitions:
       never: []
 
   y-dotted:
-    # always-doubly: [y-dotted-doubly]
-    # indicated-doubly: [y-dotted-doubly*]
-    # always: [y-dotted-single]
-    # indicated: [y-dotted-single*]
-    # never: []
     description: Dots over "y".
     remarks: >
     examples: []
@@ -399,6 +398,9 @@ presets: # TO DO: metaschema, update.
   - v-round: always
   - r-rotunda: auto
 
+fonts:
+
+  ...
 
   # insular
 

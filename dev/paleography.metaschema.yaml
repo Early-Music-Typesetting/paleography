@@ -15,7 +15,7 @@ $comment: >
 
 type: object
 additionalProperties: false
-required: [$schema, version, regex-extensions, tokens, character-classes, rule-definitions, presets]
+required: [$schema, version, mufi-snapshot, regex-extensions, tokens, character-classes, rule-definitions, presets]
 properties:
 
 
@@ -32,8 +32,31 @@ properties:
     $comment: The schema and metaschema should have the same version.
     examples: [0.5.1]
     type: string
-    const: 0.7.0
+    const: 0.8.0
 
+
+  mufi-snapshot:
+    title: MUFI Snapshot
+    description: >
+      MUFI Snapshot file consulted for providing information about entities and UTF-8 glyphs.
+    type: object
+    additionalProperties: false
+    required: [url, date]
+    properties:
+      url:
+        title: MUFI Snapshot URL
+        description: >
+          The source of the MUFI snapshot.
+        type: string
+        format: uri
+        const: https://mufi.info/q.php?q=mufiexport
+      date:
+        title: MUFI Snapshot date
+        description: >
+          A timestampt when the MUFI snapshot was visited.
+        type: string
+        format: timestamp
+        pattern: '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
 
   regex-extensions:
     title: Regex extensions
