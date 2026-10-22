@@ -7,41 +7,33 @@ title: paleography.metaschema.yaml
 description: >
   ...
 
+$comment: >
+  Definitions of terms:
+    - client - software conforming to the specification
+    - entities – MUFI entities.
+    - regex template - a regex pattern containing Paleo's extended syntax, parsed to final regex pattern.
+
 type: object
 additionalProperties: false
-required: [$schema, version, yaml-extensions, regex-extensions, tokens, character-classes, rule-definitions, presets]
+required: [$schema, version, regex-extensions, tokens, character-classes, rule-definitions, presets]
 properties:
 
+
   $schema:
-    $ref: '#/$defs/schema'
+    title: JSON Schema ID.
+    description: ID of JSON Schema this file complies to.
+    type: string
+    const: './paleography.metaschema.yaml'
+
 
   version:
     title: Version
     description: Version of the Paleography specification.
+    $comment: The schema and metaschema should have the same version.
     examples: [0.5.1]
     type: string
-    pattern: '\d+\.\d+\.\d+'
+    const: 0.7.0
 
-  yaml-extensions:
-    title: YAML extensions
-    description: >
-      Special keys informing Paleography client of additional YAML-transformation routines.
-
-      User is restricted from implementing their own "YAML extensions".
-    type: object
-    additionalProperties: false
-    required: [$schema]
-    properties:
-
-      $schema:
-        title: JSON Schema
-        description: >
-          Entry point for the Schema validation. See: https://json-schema.org/draft/2020-12/json-schema-core#name-the-schema-keyword
-        additionalProperties: false
-        required: [const]
-        properties:
-          const:
-            $ref: '#/$defs/schema'
 
   regex-extensions:
     title: Regex extensions
@@ -54,8 +46,7 @@ properties:
       NOTE: those extensions are additionally enforced by the metaschema
       and should reflect values defined in metaschema.
     type: object
-    additionalProperties:
-      $ref: '#/$defs/regex-extension'
+    additionalProperties: false
     required: [paleo-class, mufi-char, token-char, definition-ref, group-ref]
     properties:
       paleo-class:
@@ -66,7 +57,9 @@ properties:
           It allows to provide a shortcut to custom-defined
           character regex classes (such as MUFI's character classes).
         examples: ['[:myclass:]']
-        $ref: '#/$defs/regex-extension'
+        type: object
+        additionalProperties: false
+        required: [pattern]
         properties:
           pattern:
             type: string
@@ -79,7 +72,9 @@ properties:
           A character class defined as tag in MUFI
           containing a regex pattern for the whole tag's content match.
         examples: ['\m{R}', '\m{Greek}', '\m{- abbr}']
-        $ref: '#/$defs/regex-extension'
+        type: object
+        additionalProperties: false
+        required: [pattern]
         properties:
           pattern:
             type: string
@@ -95,7 +90,9 @@ properties:
           This functionality ensures that this user's intervention
           is always reflected in Paleo's rule-definitions regex templating.
         examples: ['\t{change}']
-        $ref: '#/$defs/regex-extension'
+        type: object
+        additionalProperties: false
+        required: [pattern]
         properties:
           pattern:
             title: Paleo token character class regex extension pattern.
@@ -110,19 +107,29 @@ properties:
         description: >
           Insert an elsewhere-defined subpattern into pattern by it's index (1-based).
         examples: ['#1']
-        $ref: '#/$defs/regex-extension'
+        type: object
+        additionalProperties: false
+        required: [pattern]
         properties:
           pattern:
             const: '#\d+'
 
       group-ref:
-        title: Regex captured group reference
+        # anyOf:
+        #   - $ref: '#/$defs/regex-extension'
+        title: Regex captured group reference ('backreference')
         description: >
           Insert result of a regex capture group match into string.
-        $ref: '#/$defs/regex-extension'
+
+          Groups have 1-based index. Group `\0` returns the whole matched string.
+        examples: [\1, \2]
+        type: object
+        additionalProperties: false
+        required: [pattern]
         properties:
           pattern:
             const: '\\d+'
+
 
   tokens:
     title: Tokens
@@ -133,7 +140,7 @@ properties:
     properties:
       change:
         title: Change
-        description: Token indicating substitution/abbreviation.
+        description: Token indicating substitution of one or more characters.
         $ref: '#/$defs/token'
         example: ['*']
       abbreviate-start:
@@ -158,7 +165,7 @@ properties:
         example: [']']
       expand:
         title: Expand
-        description: This token tells client to ignore paleographic change/abbreviation/ommission while still allowing to annotate text correctly.
+        description: This token tells client to ignore the effects of another token while the text remains annotated.
         $ref: '#/$defs/token'
         example: ['!']
       macro-start:
@@ -167,15 +174,18 @@ properties:
         $ref: '#/$defs/token'
         example: [\]
 
+
   character-classes:
     type: object
-    title: Character classes
+    title: Paleo character classes
     description: >
-      Characters defined in this object can be used in `substitution`'s regexp patterns
-      to match and substitute parts of the input text.
-      You can access them using Posix-inspired class syntax: `[:*:]`.
+      Character classes that can be used with substitution regex templates.
 
-      NOT: You must always use the Paleography's default signs.
+      You can access them using Posix-inspired class syntax.
+
+      IMPORTANT: when using character class based based on Paleo tokens in your regex templates,
+      you MUST use the original characters (defined here) and not user-definable token characters in `tokens`.
+    examples: ['[:*:]', '[:vowel:]']
     required:
       - '*'
       - <
@@ -186,24 +196,50 @@ properties:
       - \
       - vowel
     properties:
-      "*": {}
-      "<": {}
-      ">": {}
-      "[": {}
-      "]": {}
-      "!": {}
-      "\\": {}
-      vowel: {}
+      "*":
+        title: '"Change token" character class'
+        description: '(See #/tokens/change).'
+        const: \t{change}
+      "<":
+        title: '"Abbreviation-start token" character class'
+        description: '(See #/tokens/abbreviate-start).'
+        const: \t{abbreviate-start}
+      ">":
+        title: '"Abbreviation-end token" character class'
+        description: '(See #/tokens/abbreviate-end).'
+        const: \t{abbreviate-end}
+      "[":
+        title: '"Ommission-start token" character class'
+        description: '(See #/tokens/ommit-start).'
+        const: \t{ommit-start}
+      "]":
+        title: '"Ommission-end token" character class'
+        description: '(See #/tokens/ommit-end).'
+        const: \t{ommit-end}
+      "!":
+        title: '"Expand token" character class'
+        description: '(See #/tokens/expand).'
+        const: \t{expand}
+      "\\":
+        title: '"Macro-start token" character class'
+        description: '(See #/tokens/macro-start).'
+        const: \t{macro-start}
+      vowel:
+        title: Any vowel
+        description: Any vowel.
+        const: '[\m{A}\m{E}\m{I}\m{O}\m{U}\m{Y}]'
+
 
   rule-definitions:
-    type: object
     title: Rule definitions
-    description: All the rule definitions that can be used in `rules`.
+    description: >
+      All the rule definitions that can be used in `rules`.
+    type: object
     patternProperties:
       "^([a-z]+-)*[a-z]+$":
         oneOf:
-        - $ref: "#/$defs/rule-definition"
-        - $ref: "#/$defs/rule-deprecation"
+        - $ref: '#/$defs/rule-definition'
+        - $ref: '#/$defs/rule-deprecation'
 
   presets:
     type: object
@@ -213,40 +249,14 @@ properties:
     type: object
 
     propertyNames:
-      $ref: "#/$defs/rulename"
+      $ref: '#/$defs/rulename'
 
 
 $defs:
 
-  regex-extension:
-    title: Regex extension
-    description: >
-      Additional regex syntax features allowing pattern templating.
-    type: object
-    additionalProperties: false
-    required: [pattern]
-    properties:
-      pattern:
-        title: Regex extension pattern
-        description: Regex pattern used to match the extension syntax in regex template.
-        type: string
-
-  schema:
-    title: JSON Schema ID.
-    description: ID of JSON Schema this file complies to.
-    type: string
-    const: './paleography.metaschema.yaml'
-
-  ref:
-    title: Reference URI pattern
-    description: >
-      Only referencing specification tokens and MUFI is allowed.
-    type: string
-    const: '(#/tokens|MUFI)(/[a-z]+)+'
-
   token:
-    title: Token
-    description: A character that triggers a modification of the input text according to the rules.
+    # title: Token
+    # description: A character that triggers a modification of the input text according to the rules.
     type: string
     maxLength: 1
 
@@ -259,31 +269,57 @@ $defs:
 
   rule-definition:
     title: Rule Definition
-    description: A rule definition with all the available settings.
+    description: >
+      Definition of a spelling rule available in `rules`.
+
+      In a rule definition you provide:
+        - description and example from a real source,
+        - which MUFI entities are being used,
+        - what sequence is matched,
+        - list of 'settings' keywords how the sequence is substituted,
+
+      When a rule is executed, client compiles a regex from `./substitutions/pattern`'s template
+      by repalcing Paleo character classes with requested characters
+      (from the default `#/character-classes` or font settings.
+
+      When a match is found, it is replaced by the 'result' string.
+      This string is itself assembled from characters mapped to MUFI entities
+      and pattern's group captures (if any)
+
+      A rule tells client how to substitute original text characters
+      based on the rule's setting, tokens used and font config.
     type: object
     additionalProperties: false
-    required: [description, remarks, examples, class, characters, substitutions, settings]
+    required: [description, remarks, examples, class, entities, substitutions, settings]
     properties:
+
       description:
         title: Rule description
-        description: A short explanatory note about the rule
+        description: >
+          A short explanatory note about the rule
         type: string
+
       remarks:
         title: Rule remarks
-        description: Additional commentary on rule's background or implementation.
+        description: >
+          Additional commentary on rule's background, implementation, palaeographic resources etc.
         type: string
+
       examples:
         title: Examples
         description: >
           Examples of existing documents where the rule might apply
           containt an example Paleo encoding.
         type: array
-        minItems: 1
+        # minItems: 1
+        $comment: >
+          In future, providing at least one example will be obligatory.
         items:
           $ref: "#/$defs/source-snippet"
+
       class:
         title: Substitution Class
-        description: Class of substitution.
+        description: What kind of substitution is performed.
         anyOf:
         - const: allograph
           description: A glyph expanding to another (and only 1) glyph.
@@ -293,38 +329,24 @@ $defs:
           description: A glyph modifier signalising contraction or ommission of letters.
         - const: mixed
           description: A glyph expressing both allograph/abbreviation and contraction.
-      characters:
-        title: Characters
-        descritpion: Characters used in rule's application.
+        - const: ligature
+          description: Two or more glyphs joined together but clearly distinguishible.
+          # TO DO: kissing, touching.
+
+      entities:
+        title: MUFI entities
+        description: >
+          ...
         type: array
-        minItems: 1
         items:
-          type: object
-          additionalProperties: false
-          required: [base, char, mufi]
-          properties:
-            base:
-              title: Base Latin character (ASCII)
-              description: Most basic Latin character. It is referred in `substitutions`' `pattern` with `#1` syntax.
-              examples: [a, b, c]
-              $comment: >
-                MUFI sometimes provides a reference for base characters
-                at "Non-PUA / accessibility alternatives" section,
-                however not all characters possess it.
-              type: string
-              minLength: 1
-            char:
-              title: Character
-              description: Character *available* to use provided by MUFI. Usually it's Unicode, but occasionally MUFI points to like PUA.
-              examples: [ꟾ]
-              type: string
-              minLength: 1
-            mufi:
-              title: MUFI entity name
-              description: MUFI entity name
-              examples: [Ilong]
-              type: [string, "null"]
-              minLength: 1
+          title: MUFI entity
+          description:
+            A MUFI entity (`ent` value, without initial ampersand '&').
+          $comment: >
+            TO DO: refer to MUFI's entity list directly.
+          type: string
+          pattern: '[a-zA-Z]+'
+
       substitutions:
         title: Substitutions
         description: Substitution performed by the rule application.
@@ -336,13 +358,13 @@ $defs:
           required: [pattern, result]
           properties:
             pattern:
-              title: Pattern
+              title: Pattern (regex template)
               description: >
                 Pattern to be matched. It consists of a modified regex:
-
-                * use `#1` to select character.
-                * use capturing group
-                * use custom-defined POSIX-style character classes from `character-classes`.
+                  - use `#1` etc to select entity,
+                  - use capturing groups,
+                  - use Paleo's character classes,
+                  - use custom-defined POSIX-style character classes from `character-classes`.
                 Note: avoid using advanced regex features like non-capturing groups etc. Some implementations (like POSIX) do not support them.
               type: string
               format: regex+
@@ -350,9 +372,10 @@ $defs:
               title: Substitution result
               description: >
                 How the substitution result looks.
-                * use `#1` to select character.
+                * use `#1` to select entity.
                 * use `\1` to select group (captured in pattern).
               type: string
+
       settings:
         title: Settings
         description: A definition of rule setting consists of a list of substitutions.

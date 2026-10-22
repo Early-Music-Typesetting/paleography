@@ -2,12 +2,7 @@
 ---
 $schema: './paleography.metaschema.yaml'
 
-version: "0.5.1"
-
-yaml-extensions:
-
-  $schema:
-    const: './paleography.metaschema.yaml'
+version: 0.7.0
 
 regex-extensions:
 
@@ -36,18 +31,14 @@ tokens:
   macro-start: '\'
 
 character-classes:
-
   '*': \t{change}
   '<': \t{abbreviate-start}
   '>': \t{abbreviate-end}
   '[': \t{ommit-start}
-  ']': \t{abbreviate-end}
+  ']': \t{ommit-end}
   '!': \t{expand}
   '\': \t{macro-start}
-
-  # TO DO: add regexp's from MUFI for the symbols below:
   vowel: '[\m{A}\m{E}\m{I}\m{O}\m{U}\m{Y}]'
-
   # TO DO: those should be definiable by font!
   roudletter: '[\m{O}\m{B}\m{P}\m{H}\m{W}]' # Fractur has also "d"
 
@@ -74,9 +65,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: b[:*:]us
         result: "b#1"
@@ -90,9 +79,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: mixed # abbreviation? contraction?
-    characters:
-      - char: χ
-      - char: ρ
+    entities: [chi, rho] # χ, ρ
     substitutions:
       - pattern: "chr[:*:]([:<:]ist.*[:>:])"
         result: "#1#2\\1"
@@ -106,8 +93,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: mixed # abbreviation? contraction?
-    characters:
-      - char: χ
+    entities: [chi] # χ
     substitutions:
       - pattern: "ch[:*:]([:<:]rist.*[:>:])"
         result: "#1\\1"
@@ -125,10 +111,7 @@ rule-definitions:
         - `ɔ` – open `o`. NOTE: MUFI allows it, but reccomends to use "reversed c" instead.
     examples: []
     class: abbreviation
-    characters:
-      - base:
-        char: [ꝯ, ↄ, ꜿ]
-        mufi: [condes, conbase, condot]
+    entities: [condes, conbase, condot] # [ꝯ, ↄ, ꜿ]
     substitutions:
       - pattern: c[:*:]o[mn]
         result: "#1"
@@ -142,9 +125,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: e[:*:]t
         result: "#1"
@@ -158,9 +139,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: e[:*:]st
         result: "#1"
@@ -180,8 +159,7 @@ rule-definitions:
       Many scripts do not provide a dot (tittle) over i.
     examples: []
     class: allograph
-    characters:
-    - { char: ı, mufi: inodot }
+    entities: [inodot] # ı
     substitutions:
     - pattern: "#1[:*:]"
       result: "#1"
@@ -210,9 +188,9 @@ rule-definitions:
       As of MUFI 3.0, "enlarged small dotless i" is not a part of unicode, thus we recommend using the "epigraphic" i until it's included.
     examples:
     - source: ILVB 158
-      # link: ...
-      # img: ...
-      # script: ...
+      link: ...
+      img: ...
+      script: ...
       paleo: >
         ---
         rules:
@@ -220,9 +198,7 @@ rule-definitions:
         ---
         ...
     class: allograph
-    characters:
-      - char: [ꟾ, ]
-        mufi: [Ilong, inodotenl]
+    entities: [Ilong, inodotenl] # [ꟾ, ]
     substitutions:
     - pattern: "#1[:*:]"
       result: "#1"
@@ -236,9 +212,7 @@ rule-definitions:
       Usually final "-am", "-em" or "-um".
     examples: []
     class: allograph
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: "([:vowel:])#1[:*:]"
         result: "#1"
@@ -253,9 +227,7 @@ rule-definitions:
       This is one of the most common scriptural abbreviation.
     examples: []
     class: abbreviation
-    characters:
-      - char: ̅
-        mufi: bar
+    entities: [bar] # vertical line
     substitutions:
       - pattern: ([:vowel:])[:*:][mn]
         result: \1#1
@@ -269,9 +241,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: on[:*:]em
         result: "on#1"
@@ -286,9 +256,7 @@ rule-definitions:
       TO DO: verify whether it is only in final position.
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝫ
-        mufi: etfin
+    entities: [etfin] # ꝫ
     substitutions:
       - pattern: q[:*:]ue
         result: "q#1"
@@ -305,9 +273,7 @@ rule-definitions:
       Fraktur also has round "d"
     examples: []
     class: allograph
-    characters:
-      - char: ꝛ
-        mufi: rrot
+    entities: [rrot] # ꝛ
     substitutions:
       - pattern: ([[:roundletter:]])#1
         result: \1#1
@@ -325,9 +291,7 @@ rule-definitions:
       This is the prevailing variant of small s in old scripts.
     examples: []
     class: allograph
-    characters:
-      - char: ſ
-        mufi: slong
+    entities: [slong] # ſ
     substitutions:
       - pattern: "#1[:*:]"
         result: "#1"
@@ -342,9 +306,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: abbreviation
-    characters:
-      - char: ꝰ
-        mufi: usmod
+    entities: [usmod] # ꝰ
     substitutions:
       - pattern: u[:*:]s
         result: "#1"
@@ -361,12 +323,10 @@ rule-definitions:
       (in a similar way that some modern Latin conventions do not distinguish between "i" and "j").
     examples: []
     class: allograph
-    characters:
-      - char: u
-        mufi: null
+    entities: []
     substitutions:
       - pattern: "v[:*:]"
-        result: "#1"
+        result: "u"
     settings:
       always: ["#1"]
       indicated: ["#1*"]
@@ -382,9 +342,7 @@ rule-definitions:
     remarks: >
     examples: []
     class: allograph
-    characters:
-      - char: ẏ # compound. single: ẏ
-      - char: ÿ # compound. single: ÿ
+    entities: [ydot, yuml] # compound ẏ, ÿ (or single ẏ, ÿ)
     substitutions:
       - pattern: y[:*:]
         result: "#1"
