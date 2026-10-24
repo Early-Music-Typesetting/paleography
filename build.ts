@@ -138,8 +138,6 @@ async function setFont() {
 
   const entities = await queryEntities.evaluate(SPEC)
 
-  console.log(entities['con-initial'].prefixItems)
-
   META.properties.fonts.additionalProperties.properties.entities.properties = entities
 
 }

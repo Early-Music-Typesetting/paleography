@@ -1,0 +1,1992 @@
+$schema: ./paleography.metaschema.yaml
+version: 0.9.0
+mufi-snapshot:
+  url: https://mufi.info/q.php?q=mufiexport
+  date: 2026-10-24T02:18:18.664Z
+regex-extensions:
+  paleo-class:
+    pattern: \[:([a-z]+|\*+|\<|\>|\[|\]|!|\\):\]
+  mufi-char:
+    pattern: \m{([A-Z]|- )[a-z]*}
+  token-char:
+    pattern: \t{(change|abbreviate-start|abbreviate-end|ommit-start|ommit-end|expand|macro-start)}
+  definition-ref:
+    pattern: "#\\d+"
+  group-ref:
+    pattern: \\d+
+tokens:
+  change: "*"
+  abbreviate-start: <
+  abbreviate-end: ">"
+  ommit-start: "["
+  ommit-end: "]"
+  expand: "!"
+  macro-start: \
+character-classes:
+  "*": \t{change}
+  <: \t{abbreviate-start}
+  ">": \t{abbreviate-end}
+  "[": \t{ommit-start}
+  "]": \t{ommit-end}
+  "!": \t{expand}
+  \: \t{macro-start}
+  vowel: "[\\m{A}\\m{E}\\m{I}\\m{O}\\m{U}\\m{Y}]"
+  roudletter: "[\\m{O}\\m{B}\\m{P}\\m{H}\\m{W}]"
+rule-definitions:
+  bus-final:
+    description: Final "-bus"
+    remarks: ""
+    examples: []
+    class: abbreviation
+    entities:
+      - etfin
+    substitutions:
+      - pattern: b[:*:]us
+        result: b#1
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  christ-xp:
+    description: Christ- expressed as "chi-rho".
+    remarks: ""
+    examples: []
+    class: mixed
+    entities:
+      - chi
+      - rho
+    substitutions:
+      - pattern: chr[:*:]([:<:]ist.*[:>:])
+        result: "#1#2\\1"
+    settings:
+      always:
+        - "#1-"
+      indicated:
+        - "#1-*"
+      never: []
+  christ-x:
+    description: Christ- expressed as "chi" alone.
+    remarks: ""
+    examples: []
+    class: mixed
+    entities:
+      - chi
+    substitutions:
+      - pattern: ch[:*:]([:<:]rist.*[:>:])
+        result: "#1\\1"
+    settings:
+      always:
+        - "#1-"
+      indicated:
+        - "#1-*"
+      never: []
+  con-initial:
+    description: initial "con" or "com"
+    remarks: >
+      There are a few ways initial "con" is abbreviated:
+        - `ꝯ` – most typical.
+        - `ↄ` – reversed "c" (with or without dot inside)
+        - `ɔ` – open `o`. NOTE: MUFI allows it, but reccomends to use "reversed c" instead.
+    examples: []
+    class: abbreviation
+    entities:
+      - condes
+      - conbase
+      - condot
+    substitutions:
+      - pattern: c[:*:]o[mn]
+        result: "#1"
+    settings:
+      always:
+        - "#1-"
+      indicated:
+        - "#1-*"
+      never: []
+  et-final:
+    description: Final "et"
+    remarks: ""
+    examples: []
+    class: abbreviation
+    entities:
+      - etfin
+    substitutions:
+      - pattern: e[:*:]t
+        result: "#1"
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  est-final:
+    description: Final "est"
+    remarks: ""
+    examples: []
+    class: abbreviation
+    entities:
+      - etfin
+    substitutions:
+      - pattern: e[:*:]st
+        result: "#1"
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  i-dotless:
+    description: A small 'i' without a dot (tittle).
+    remarks: |
+      Many scripts do not provide a dot (tittle) over i.
+    examples: []
+    class: allograph
+    entities:
+      - inodot
+    substitutions:
+      - pattern: "#1[:*:]"
+        result: "#1"
+    settings:
+      always:
+        - "#1"
+      indicated:
+        - "#1*"
+      never: []
+  i-initial-enlarged:
+    description: Initial small "i" enlarges.
+    remarks: >
+      It is not yet clear wether this character should be represented by
+      Unicode/MUFI "epigraphic I longa" `ꟾ` or MUFI's "enlarged small dotless i"
+      ``.
+
+      Wikipedia hints for Long_I, but only for late Roman and early medieval
+      scripts: ttps://en.wikipedia.org/wiki/Long_I Examples contain an early XVI
+      c. bastarda / fraktur (???) script from ILVB 158.
+
+      As of MUFI 3.0, "enlarged small dotless i" is not a part of unicode, thus
+      we recommend using the "epigraphic" i until it's included.
+    examples:
+      - source: ILVB 158
+        link: ...
+        img: ...
+        script: ...
+        paleo: |
+          --- rules:
+            i-initial-enlarged: indicated
+          --- ...
+    class: allograph
+    entities:
+      - Ilong
+      - inodotenl
+    substitutions:
+      - pattern: "#1[:*:]"
+        result: "#1"
+    settings:
+      always:
+        - "#1-"
+      indicated:
+        - "#1-*"
+  m-final:
+    description: Final "m".
+    remarks: |
+      Usually final "-am", "-em" or "-um".
+    examples: []
+    class: allograph
+    entities:
+      - etfin
+    substitutions:
+      - pattern: ([:vowel:])#1[:*:]
+        result: "#1"
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  nasal:
+    description: Nasal stroke
+    remarks: |
+      This is one of the most common scriptural abbreviation.
+    examples: []
+    class: abbreviation
+    entities:
+      - bar
+    substitutions:
+      - pattern: ([:vowel:])[:*:][mn]
+        result: \1#1
+    settings:
+      always:
+        - "#1"
+      indicated:
+        - "#1*"
+      never: []
+  onem-final:
+    description: Final "-onem"
+    remarks: ""
+    examples: []
+    class: abbreviation
+    entities:
+      - etfin
+    substitutions:
+      - pattern: on[:*:]em
+        result: on#1
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  que-final:
+    description: Final "que"
+    remarks: |
+      TO DO: verify whether it is only in final position.
+    examples: []
+    class: abbreviation
+    entities:
+      - etfin
+    substitutions:
+      - pattern: q[:*:]ue
+        result: q#1
+    settings:
+      always:
+        - -#1
+      indicated:
+        - -#1*
+      never: []
+  r-rotunda:
+    description: Variant of 'r' before "round" letters.
+    remarks: >
+      Different types have different definitions of what a "round" letter is.
+      For gothic scripts its "o", "b", "p", "h", "w". Fraktur also has round "d"
+    examples: []
+    class: allograph
+    entities:
+      - rrot
+    substitutions:
+      - pattern: ([[:roundletter:]])#1
+        result: \1#1
+      - pattern: "#1"
+        result: "#1"
+    settings:
+      always:
+        - "#2"
+      auto:
+        - "#1"
+      indicated:
+        - "#1*"
+      never: []
+  s-long:
+    description: Long s
+    remarks: |
+      This is the prevailing variant of small s in old scripts.
+    examples: []
+    class: allograph
+    entities:
+      - slong
+    substitutions:
+      - pattern: "#1[:*:]"
+        result: "#1"
+    settings:
+      always:
+        - "#1"
+      auto:
+        - "#1-"
+        - -#1-
+        - -#1*
+      indicated:
+        - "#1*"
+      never: []
+  us-final:
+    description: Final -us or -er (ending of nominative 2nd declention)
+    remarks: ""
+    examples: []
+    class: abbreviation
+    entities:
+      - usmod
+    substitutions:
+      - pattern: u[:*:]s
+        result: "#1"
+      - pattern: e[:*:]r
+        result: "#1"
+    settings:
+      always:
+        - -#1
+        - -#2
+      indicated:
+        - -#1*
+        - -#2*
+  v-round:
+    description: Round variant of "v".
+    remarks: >
+      Most old scripts do not distinguish between "v" and "u" (in a similar way
+      that some modern Latin conventions do not distinguish between "i" and
+      "j").
+    examples: []
+    class: allograph
+    entities: []
+    substitutions:
+      - pattern: v[:*:]
+        result: u
+    settings:
+      always:
+        - "#1"
+      indicated:
+        - "#1*"
+      never: []
+  y-dotted:
+    description: Dots over "y".
+    remarks: ""
+    examples: []
+    class: allograph
+    entities:
+      - ydot
+      - yuml
+    substitutions:
+      - pattern: y[:*:]
+        result: "#1"
+      - pattern: y[:*:]
+        result: "#2"
+    settings:
+      always-single:
+        - "#1"
+      indicated-single:
+        - "#1*"
+      always-double:
+        - "#2"
+      indicated-double:
+        - "#2"
+      auto:
+        - "#2**"
+        - "#1*"
+      never: []
+  christ:
+    deprecated: true
+    remarks: >
+      For "x" use "christ-x" and mark abbreviation "ch*<rist..>..". For "xp",
+      use "christ-xp" and mark special abbreviation ("chr*<ist..>..").
+    version: 0.4.0
+    target: null
+  i-initial-capitalized:
+    deprecated: true
+    remarks: use `i-initial-enlarged`
+    version: 0.4.0
+    target: i-initial-enlarged
+  v-as-u:
+    deprecated: true
+    remarks: use `v-round`
+    version: 0.4.0
+    target: v-round
+presets:
+  medieval:
+    - i-dotless: always
+    - s-long: auto
+    - et-final: indicated
+    - m-final: indicated
+    - nasal: indicated
+    - v-round: always
+    - r-rotunda: auto
+    - y-dotted: always-single
+    - christ: indicated
+  renaissance:
+    - s-long: auto
+    - m-final: indicated
+    - nasal: indicated
+    - v-round: always
+    - r-rotunda: auto
+unicode:
+  sp: " "
+  excl: "!"
+  quot: '"'
+  num: "#"
+  dollar: $
+  percnt: "%"
+  amp: "&"
+  apos: "'"
+  lpar: (
+  rpar: )
+  ast: "*"
+  plus: +
+  comma: ","
+  hyphen: "-"
+  period: .
+  sol: /
+  colon: ":"
+  semi: ;
+  lt: <
+  equals: =
+  gt: ">"
+  quest: "?"
+  commat: "@"
+  lsqb: "["
+  bsol: \
+  rsqb: "]"
+  circ: ^
+  lowbar: _
+  grave: "`"
+  lcub: "{"
+  verbar: "|"
+  rcub: "}"
+  tld: "~"
+  nbsp:  
+  iexcl: ¡
+  cent: ¢
+  pound: £
+  curren: ¤
+  yen: ¥
+  brvbar: ¦
+  sect: §
+  uml: ¨
+  copy: ©
+  ordf: ª
+  laquo: «
+  not: ¬
+  shy: ­
+  reg: ®
+  macr: ¯
+  deg: °
+  plusmn: ±
+  sup2: ²
+  sup3: ³
+  acute: ´
+  micro: µ
+  para: ¶
+  middot: ·
+  cedil: ¸
+  sup1: ¹
+  ordm: º
+  raquo: »
+  frac14: ¼
+  frac12: ½
+  frac34: ¾
+  iquest: ¿
+  Agrave: À
+  Aacute: Á
+  Acirc: Â
+  Atilde: Ã
+  Auml: Ä
+  Aring: Å
+  AElig: Æ
+  Ccedil: Ç
+  Egrave: È
+  Eacute: É
+  Ecirc: Ê
+  Euml: Ë
+  Igrave: Ì
+  Iacute: Í
+  Icirc: Î
+  Iuml: Ï
+  ETH: Ð
+  Ntilde: Ñ
+  Ograve: Ò
+  Oacute: Ó
+  Ocirc: Ô
+  Otilde: Õ
+  Ouml: Ö
+  times: ×
+  Oslash: Ø
+  Ugrave: Ù
+  Uacute: Ú
+  Ucirc: Û
+  Uuml: Ü
+  Yacute: Ý
+  THORN: Þ
+  szlig: ß
+  agrave: à
+  aacute: á
+  acirc: â
+  atilde: ã
+  auml: ä
+  aring: å
+  aelig: æ
+  ccedil: ç
+  egrave: è
+  eacute: é
+  ecirc: ê
+  euml: ë
+  igrave: ì
+  iacute: í
+  icirc: î
+  iuml: ï
+  eth: ð
+  ntilde: ñ
+  ograve: ò
+  oacute: ó
+  ocirc: ô
+  otilde: õ
+  ouml: ö
+  divide: ÷
+  oslash: ø
+  ugrave: ù
+  uacute: ú
+  ucirc: û
+  uuml: ü
+  yacute: ý
+  thorn: þ
+  yuml: ÿ
+  Amacr: Ā
+  amacr: ā
+  Abreve: Ă
+  abreve: ă
+  Aogon: Ą
+  aogon: ą
+  Cacute: Ć
+  cacute: ć
+  Cdot: Ċ
+  cdot: ċ
+  Dstrok: Đ
+  dstrok: đ
+  Emacr: Ē
+  emacr: ē
+  Ebreve: Ĕ
+  ebreve: ĕ
+  Edot: Ė
+  edot: ė
+  Eogon: Ę
+  eogon: ę
+  Gdot: Ġ
+  gdot: ġ
+  hstrok: ħ
+  Imacr: Ī
+  imacr: ī
+  Ibreve: Ĭ
+  ibreve: ĭ
+  Iogon: Į
+  iogon: į
+  Idot: İ
+  inodot: ı
+  IJlig: Ĳ
+  ijlig: ĳ
+  Lacute: Ĺ
+  lacute: ĺ
+  Lstrok: Ł
+  lstrok: ł
+  Nacute: Ń
+  nacute: ń
+  ENG: Ŋ
+  eng: ŋ
+  Omacr: Ō
+  omacr: ō
+  Obreve: Ŏ
+  obreve: ŏ
+  Odblac: Ő
+  odblac: ő
+  OElig: Œ
+  oelig: œ
+  Racute: Ŕ
+  racute: ŕ
+  Sacute: Ś
+  sacute: ś
+  Umacr: Ū
+  umacr: ū
+  Ubreve: Ŭ
+  ubreve: ŭ
+  Uring: Ů
+  uring: ů
+  Udblac: Ű
+  udblac: ű
+  Uogon: Ų
+  uogon: ų
+  Wcirc: Ŵ
+  wcirc: ŵ
+  Ycirc: Ŷ
+  ycirc: ŷ
+  Yuml: Ÿ
+  Zdot: Ż
+  zdot: ż
+  slong: ſ
+  bstrok: ƀ
+  hwair: ƕ
+  khook: ƙ
+  lbar: ƚ
+  Mturn: Ɯ
+  nlrleg: ƞ
+  YR: Ʀ
+  Zstrok: Ƶ
+  zstrok: ƶ
+  EZH: Ʒ
+  wynn: ƿ
+  Ocar: Ǒ
+  ocar: ǒ
+  Ucar: Ǔ
+  ucar: ǔ
+  Uumlmacr: Ǖ
+  uumlmacr: ǖ
+  AEligmacr: Ǣ
+  aeligmacr: ǣ
+  Gstrok: Ǥ
+  gstrok: ǥ
+  Oogon: Ǫ
+  oogon: ǫ
+  Oogonmacr: Ǭ
+  oogonmacr: ǭ
+  Gacute: Ǵ
+  gacute: ǵ
+  HWAIR: Ƕ
+  WYNN: Ƿ
+  AEligacute: Ǽ
+  aeligacute: ǽ
+  Oslashacute: Ǿ
+  oslashacute: ǿ
+  YOGH: Ȝ
+  yogh: ȝ
+  Adot: Ȧ
+  adot: ȧ
+  Oumlmacr: Ȫ
+  oumlmacr: ȫ
+  Odot: Ȯ
+  odot: ȯ
+  Ymacr: Ȳ
+  ymacr: ȳ
+  jnodot: ȷ
+  Jbar: Ɉ
+  jbar: ɉ
+  oopen: ɔ
+  dtail: ɖ
+  schwa: ə
+  jnodotstrok: ɟ
+  gopen: ɡ
+  gscap: ɢ
+  hhook: ɦ
+  istrok: ɨ
+  iscap: ɪ
+  mturn: ɯ
+  nlfhook: ɲ
+  nscap: ɴ
+  oeligscap: ɶ
+  rdes: ɼ
+  rscap: ʀ
+  ubar: ʉ
+  yscap: ʏ
+  ezh: ʒ
+  bscap: ʙ
+  hscap: ʜ
+  lscap: ʟ
+  apomod: ʼ
+  verbarup: ˈ
+  breve: ˘
+  dot: ˙
+  ring: ˚
+  ogon: ˛
+  tilde: ˜
+  dblac: ˝
+  xmod: ˣ
+  combgrave: ̀
+  combacute: ́
+  combcirc: ̂
+  combtilde: ̃
+  combmacr: ̄
+  bar: ̅
+  combbreve: ̆
+  combdot: ̇
+  combuml: ̈
+  combhook: ̉
+  combring: ̊
+  combdblac: ̋
+  combsgvertl: ̍
+  combdbvertl: ̎
+  combdblgrave: ̏
+  combcomma: ̕
+  combdotbl: ̣
+  combringbl: ̥
+  combced: ̧
+  combogon: ̨
+  combbrevinvbl: ̯
+  barbl: ̲
+  dblbarbl: ̳
+  baracr: ̶
+  combtildevert: ̾
+  dblovl: ̿
+  cgj: ͏
+  combastbl: ͙
+  er: ͛
+  combdblbrevebl: ͜
+  combdbltilde: ͠
+  combdblbinvbreve: ͡
+  asup: ͣ
+  esup: ͤ
+  isup: ͥ
+  osup: ͦ
+  usup: ͧ
+  csup: ͨ
+  dsup: ͩ
+  hsup: ͪ
+  msup: ͫ
+  rsup: ͬ
+  tsup: ͭ
+  vsup: ͮ
+  xsup: ͯ
+  tridotright: ჻
+  fMedrun: ᚠ
+  mMedrun: ᛘ
+  trotsup: ᫎ
+  ascap: ᴀ
+  aeligscap: ᴁ
+  cscap: ᴄ
+  dscap: ᴅ
+  ethscap: ᴆ
+  escap: ᴇ
+  jscap: ᴊ
+  kscap: ᴋ
+  mscap: ᴍ
+  oscap: ᴏ
+  pscap: ᴘ
+  tscap: ᴛ
+  uscap: ᴜ
+  vscap: ᴠ
+  wscap: ᴡ
+  zscap: ᴢ
+  Imod: ᴵ
+  uelig: ᵫ
+  gins: ᵹ
+  combcircdbl: ᷍
+  combcurl: ᷎
+  ersub: ᷏
+  combisbelow: ᷐
+  ur: ᷑
+  us: ᷒
+  ra: ᷓ
+  aeligsup: ᷔ
+  aoligsup: ᷕ
+  avligsup: ᷖ
+  ccedilsup: ᷗ
+  drotsup: ᷘ
+  ethsup: ᷙ
+  gsup: ᷚ
+  gscapsup: ᷛ
+  ksup: ᷜ
+  lsup: ᷝ
+  lscapsup: ᷞ
+  mscapsup: ᷟ
+  nsup: ᷠ
+  nscapsup: ᷡ
+  rscapsup: ᷢ
+  rrotsup: ᷣ
+  ssup: ᷤ
+  slongsup: ᷥ
+  zsup: ᷦ
+  bsup: ᷨ
+  fsup: ᷫ
+  psup: ᷮ
+  wsup: ᷱ
+  Bdot: Ḃ
+  bdot: ḃ
+  Bdotbl: Ḅ
+  bdotbl: ḅ
+  Ddot: Ḋ
+  ddot: ḋ
+  Ddotbl: Ḍ
+  ddotbl: ḍ
+  Emacracute: Ḗ
+  emacracute: ḗ
+  Fdot: Ḟ
+  fdot: ḟ
+  hdot: Ḣ
+  Hdot: ḣ
+  Hdotbl: Ḥ
+  hdotbl: ḥ
+  Kacute: Ḱ
+  kacute: ḱ
+  Kdotbl: Ḳ
+  kdotbl: ḳ
+  Ldotbl: Ḷ
+  ldotbl: ḷ
+  Macute: Ḿ
+  macute: ḿ
+  Mdot: Ṁ
+  mdot: ṁ
+  Mdotbl: Ṃ
+  mdotbl: ṃ
+  Ndot: Ṅ
+  ndot: ṅ
+  Ndotbl: Ṇ
+  ndotbl: ṇ
+  Omacracute: Ṓ
+  omacracute: ṓ
+  Pacute: Ṕ
+  pacute: ṕ
+  Pdot: Ṗ
+  pdot: ṗ
+  Rdot: Ṙ
+  rdot: ṙ
+  Rdotbl: Ṛ
+  rdotbl: ṛ
+  Sdot: Ṡ
+  sdot: ṡ
+  Sdotbl: Ṣ
+  sdotbl: ṣ
+  Tdot: Ṫ
+  tdot: ṫ
+  Tdotbl: Ṭ
+  tdotbl: ṭ
+  Vdotbl: Ṿ
+  vdotbl: ṿ
+  Wgrave: Ẁ
+  wgrave: ẁ
+  Wacute: Ẃ
+  wacute: ẃ
+  Wuml: Ẅ
+  wuml: ẅ
+  Wdot: Ẇ
+  wdot: ẇ
+  Wdotbl: Ẉ
+  wdotbl: ẉ
+  Ydot: Ẏ
+  ydot: ẏ
+  Zdotbl: Ẓ
+  zdotbl: ẓ
+  wring: ẘ
+  yring: ẙ
+  slongbarslash: ẜ
+  slongbar: ẝ
+  SZlig: ẞ
+  dscript: ẟ
+  Adotbl: Ạ
+  adotbl: ạ
+  Ahook: Ả
+  ahook: ả
+  Abreveacute: Ắ
+  abreveacute: ắ
+  Edotbl: Ẹ
+  edotbl: ẹ
+  Ihook: Ỉ
+  ihook: ỉ
+  Idotbl: Ị
+  idotbl: ị
+  Odotbl: Ọ
+  odotbl: ọ
+  Ohook: Ỏ
+  ohook: ỏ
+  Udotbl: Ụ
+  udotbl: ụ
+  Uhook: Ủ
+  uhook: ủ
+  Ygrave: Ỳ
+  ygrave: ỳ
+  Ydotbl: Ỵ
+  ydotbl: ỵ
+  Yhook: Ỷ
+  yhook: ỷ
+  LLwelsh: Ỻ
+  llwelsh: ỻ
+  Vwelsh: Ỽ
+  vwelsh: ỽ
+  Yloop: Ỿ
+  yloop: ỿ
+  enqd:  
+  emqd:  
+  ensp:  
+  emsp:  
+  emsp13:  
+  emsp14:  
+  emsp16:  
+  numsp:  
+  puncsp:  
+  thinsp:  
+  hairsp:  
+  zerosp: ​
+  zwj: ‍
+  dash: ‐
+  nbhy: ‑
+  numdash: ‒
+  ndash: –
+  mdash: —
+  horbar: ―
+  Verbar: ‖
+  lsquo: ‘
+  rsquo: ’
+  lsquolow: ‚
+  rsquorev: ‛
+  ldquo: “
+  rdquo: ”
+  ldquolow: „
+  rdquorev: ‟
+  dagger: †
+  Dagger: ‡
+  bull: •
+  tribull: ‣
+  sgldr: ․
+  dblldr: ‥
+  hellip: …
+  hyphpoint: ‧
+  nnbsp:  
+  permil: ‰
+  prime: ′
+  Prime: ″
+  lsaquo: ‹
+  rsaquo: ›
+  refmark: ※
+  triast: ⁂
+  fracsol: ⁄
+  lsqbqu: ⁅
+  rsqbqu: ⁆
+  et: ⁊
+  revpara: ⁋
+  tridotleft: ⁖
+  lozengedot: ⁘
+  dotcross: ⁜
+  sup0: ⁰
+  sup4: ⁴
+  sup5: ⁵
+  sup6: ⁶
+  sup7: ⁷
+  sup8: ⁸
+  sup9: ⁹
+  supminus: ⁻
+  sub0: ₀
+  sub1: ₁
+  sub2: ₂
+  sub3: ₃
+  sub4: ₄
+  sub5: ₅
+  sub6: ₆
+  sub7: ₇
+  sub8: ₈
+  sub9: ₉
+  pennygerm: ₰
+  scruple: ℈
+  lbbar: ℔
+  Rtailstrok: ℞
+  Rslstrok: ℟
+  Vslstrok: ℣
+  ounce: ℥
+  Fturn: Ⅎ
+  fturn: ⅎ
+  romnumCDlig: ↀ
+  romnumDDlig: ↁ
+  romnumDDdbllig: ↂ
+  romnumCrev: Ↄ
+  conbase: ↄ
+  arrsgllw: ←
+  arrsglupw: ↑
+  arrsglrw: →
+  arrsgldw: ↓
+  minus: −
+  infin: ∞
+  logand: ∧
+  tridotupw: ∴
+  tridotdw: ∵
+  quaddot: ∷
+  est: ∻
+  esse: ≈
+  notequals: ≠
+  dipledot: ⋗
+  metrshort: ⏑
+  metrshortlong: ⏒
+  metrlongshort: ⏓
+  metrdblshortlong: ⏔
+  squareblsm: ▪
+  squarewhsm: ▫
+  trirightwh: ▹
+  trileftwh: ◃
+  circledot: ◌
+  blackcircle: ●
+  cross: ✝
+  hedera: ❦
+  hederarot: ❧
+  lwhsqb: ⟦
+  rwhsqb: ⟧
+  langb: ⟨
+  rangb: ⟩
+  dblsol: ⫽
+  Hhalf: Ⱶ
+  hhalf: ⱶ
+  Vmod: ⱽ
+  luhsqbNT: ⸀
+  luslst: ⸌
+  ruslst: ⸍
+  dbloblhyph: ⸗
+  ramus: ⸙
+  rlslst: ⸜
+  llslst: ⸝
+  verbarql: ⸠
+  verbarqr: ⸡
+  luhsqb: ⸢
+  ruhsqb: ⸣
+  llhsqb: ⸤
+  rlhsqb: ⸥
+  lUbrack: ⸦
+  rUbrack: ⸧
+  ldblpar: ⸨
+  rdblpar: ⸩
+  tridotsdownw: ⸪
+  tridotsupw: ⸫
+  quaddots: ⸬
+  fivedots: ⸭
+  punctpercont: ⸮
+  midring: ⸰
+  dblhyph: ⹀
+  virgsusp: ⹊
+  tridagger: ⹋
+  medcom: ⹌
+  punctelev: ⹎
+  ET: ⹒
+  fscap: ꜰ
+  sscap: ꜱ
+  AAlig: Ꜳ
+  aalig: ꜳ
+  AOlig: Ꜵ
+  aolig: ꜵ
+  AUlig: Ꜷ
+  aulig: ꜷ
+  AVlig: Ꜹ
+  avlig: ꜹ
+  AVligslash: Ꜻ
+  avligslash: ꜻ
+  AYlig: Ꜽ
+  aylig: ꜽ
+  CONdot: Ꜿ
+  condot: ꜿ
+  Kbar: Ꝁ
+  kbar: ꝁ
+  Kstrleg: Ꝃ
+  kstrleg: ꝃ
+  Kstrascleg: Ꝅ
+  kstrascleg: ꝅ
+  Lbrk: Ꝇ
+  lbrk: ꝇ
+  Lhighstrok: Ꝉ
+  lhighstrok: ꝉ
+  OBIIT: Ꝋ
+  obiit: ꝋ
+  Oloop: Ꝍ
+  oloop: ꝍ
+  OOlig: Ꝏ
+  oolig: ꝏ
+  Pbardes: Ꝑ
+  pbardes: ꝑ
+  Pflour: Ꝓ
+  pflour: ꝓ
+  Psquirrel: Ꝕ
+  psquirrel: ꝕ
+  Qbardes: Ꝗ
+  qbardes: ꝗ
+  Qslstrok: Ꝙ
+  qslstrok: ꝙ
+  Rrot: Ꝛ
+  rrot: ꝛ
+  RUM: Ꝝ
+  rum: ꝝ
+  Vdiagstrok: Ꝟ
+  vdiagstrok: ꝟ
+  YYlig: Ꝡ
+  yylig: ꝡ
+  Zvisigot: Ꝣ
+  zvisigot: ꝣ
+  THORNbar: Ꝥ
+  thornbar: ꝥ
+  THORNbardes: Ꝧ
+  thornbardes: ꝧ
+  Vins: Ꝩ
+  vins: ꝩ
+  ETfin: Ꝫ
+  etfin: ꝫ
+  IS: Ꝭ
+  is: ꝭ
+  CONdes: Ꝯ
+  condes: ꝯ
+  usmod: ꝰ
+  dtailstrok: ꝱ
+  ltailstrok: ꝲ
+  mtailstrok: ꝳ
+  ntailstrok: ꝴ
+  rtailstrok: ꝵ
+  rscaptailstrok: ꝶ
+  ttailstrok: ꝷ
+  sstrok: ꝸ
+  Drot: Ꝺ
+  drot: ꝺ
+  Fins: Ꝼ
+  fins: ꝼ
+  Gins: Ᵹ
+  Ginsturn: Ꝿ
+  ginsturn: ꝿ
+  Lturn: Ꞁ
+  lturn: ꞁ
+  Rins: Ꞃ
+  rins: ꞃ
+  Sins: Ꞅ
+  sins: ꞅ
+  Trot: Ꞇ
+  trot: ꞇ
+  qscap: ꞯ
+  Wangl: Ꟃ
+  wangl: ꟃ
+  Frev: ꟻ
+  Prev: ꟼ
+  Minv: ꟽ
+  Ilong: ꟾ
+  M5leg: ꟿ
+  xldes: ꭗ
+  Aogonacute: 
+  Amacracute: 
+  Amacrbreve: 
+  Adblac: 
+  Aesup: 
+  Acurl: 
+  AEligdotbl: 
+  AEligmacracute: 
+  AEligmacrbreve: 
+  AEligbreve: 
+  AEligogon: 
+  AEligdblac: 
+  AEliguml: 
+  AEligdot: 
+  Bacute: 
+  Cdotbl: 
+  Cogon: 
+  Dacute: 
+  ETHdotbl: 
+  Eogonacute: 
+  Emacrbreve: 
+  Eogonmacr: 
+  Edotacute: 
+  Edblac: 
+  Easup: 
+  Eogondotbl: 
+  Ecurl: 
+  Eogondblac: 
+  Eogondot: 
+  Eogondotacute: 
+  Fdotbl: 
+  Facute: 
+  Gdotbl: 
+  Hacute: 
+  Icurl: 
+  Imacracute: 
+  Imacrbreve: 
+  Idblac: 
+  Iovlhigh: 
+  Jdotbl: 
+  Jovlhigh: 
+  Jacute: 
+  Jmacrhigh: 
+  Jdot: 
+  Jdblac: 
+  Jcurl: 
+  Kdot: 
+  Ldot: 
+  Mmacrhigh: 
+  Movlhigh: 
+  Nmacrhigh: 
+  Oogondotbl: 
+  Oogonacute: 
+  Omacrbreve: 
+  Oumlcirc: 
+  Oesup: 
+  Ousup: 
+  Oogoncurl: 
+  Oslashmacr: 
+  Oslashmacrbreve: 
+  Oslashogon: 
+  Oslashogonacute: 
+  OEligacute: 
+  OEligmacr: 
+  OEligmacrbreve: 
+  OEligogon: 
+  Pdblac: 
+  Pdotbl: 
+  Qdot: 
+  Qdotbl: 
+  Tacute: 
+  Togon: 
+  Umacracute: 
+  Umacrbreve: 
+  Udot: 
+  Uumlcirc: 
+  Uvertline: 
+  Uesup: 
+  Uosup: 
+  Ucurl: 
+  THORNbarslash: 
+  Vacute: 
+  Vcirc: 
+  Vuml: 
+  Vdblac: 
+  Vdot: 
+  Vmacr: 
+  Vvertline: 
+  Wdblac: 
+  Wesup: 
+  Wmacr: 
+  Ymacracute: 
+  Ymacrbreve: 
+  Ybreve: 
+  Ydblac: 
+  Ydotacute: 
+  Ycurl: 
+  THORNdotbl: 
+  Ocurl: 
+  Oslashcurl: 
+  Finsdotbl: 
+  Vinsdotbl: 
+  Vinsdot: 
+  aogonacute: 
+  amacracute: 
+  amacrbreve: 
+  aumlcirc: 
+  adotbluml: 
+  aringcirc: 
+  adblac: 
+  aesup: 
+  aosup: 
+  avsup: 
+  acurl: 
+  ausup: 
+  aeligdotbl: 
+  aeligmacracute: 
+  aeligmacrbreve: 
+  aeligbreve: 
+  aeligogon: 
+  aeligdblac: 
+  aeliguml: 
+  aeligdot: 
+  bacute: 
+  bovlmed: 
+  cdotbl: 
+  cogon: 
+  dacute: 
+  ethdotbl: 
+  dovlmed: 
+  edotblacute: 
+  eogonacute: 
+  eogoncirc: 
+  emacrbreve: 
+  eogonmacr: 
+  edotacute: 
+  eumlmacr: 
+  ering: 
+  edblac: 
+  easup: 
+  eisup: 
+  evsup: 
+  eogondotbl: 
+  ecurl: 
+  eogondblac: 
+  eogondot: 
+  eogondotacute: 
+  fdotbl: 
+  facute: 
+  eesup: 
+  eosup: 
+  gdotbl: 
+  hacute: 
+  hovlmed: 
+  icurl: 
+  imacracute: 
+  imacrbreve: 
+  idblac: 
+  ibrevinvbl: 
+  iesup: 
+  ivsup: 
+  iovlmed: 
+  jdotbl: 
+  jovlmed: 
+  jacute: 
+  jmacrmed: 
+  jdblac: 
+  jcurl: 
+  kdot: 
+  lovlhigh: 
+  lmacrhigh: 
+  ldot: 
+  lringbl: 
+  lovlmed: 
+  mmacrmed: 
+  mringbl: 
+  movlmed: 
+  ncirc: 
+  nmacrmed: 
+  nringbl: 
+  oogondotbl: 
+  oogonacute: 
+  oogoncirc: 
+  omacrbreve: 
+  oumlacute: 
+  oumlcirc: 
+  oring: 
+  oasup: 
+  oesup: 
+  oisup: 
+  ousup: 
+  ovsup: 
+  oogoncurl: 
+  oslashmacr: 
+  oslashmacrbreve: 
+  oslashogon: 
+  oslashogonacute: 
+  oeligacute: 
+  oeligmacr: 
+  oeligmacrbreve: 
+  oeligogon: 
+  pmacr: 
+  pdblac: 
+  pdotbl: 
+  qmacr: 
+  qdot: 
+  qdotbl: 
+  qbardestilde: 
+  rringbl: 
+  tacute: 
+  togon: 
+  umacracute: 
+  umacrbreve: 
+  udot: 
+  uumlcirc: 
+  uvertline: 
+  ubrevinvbl: 
+  uesup: 
+  uisup: 
+  uosup: 
+  ucurl: 
+  iasup: 
+  thornslonglig: 
+  thornslongligbar: 
+  thornacute: 
+  vacute: 
+  vcirc: 
+  vuml: 
+  vring: 
+  vdblac: 
+  vdot: 
+  vmacr: 
+  vbar: 
+  vvertline: 
+  wdblac: 
+  wesup: 
+  wosup: 
+  wmacr: 
+  wisup: 
+  ymacracute: 
+  ymacrbreve: 
+  ybreve: 
+  ybar: 
+  ydblac: 
+  yesup: 
+  ydotacute: 
+  ycurl: 
+  slongovlmed: 
+  thorndotbl: 
+  thornovlmed: 
+  nbar: 
+  rrotdotbl: 
+  slongdotbl: 
+  kovlmed: 
+  hslongligbar: 
+  kslongligbar: 
+  oopenmacr: 
+  ocurl: 
+  oslashcurl: 
+  rdesstrok: 
+  finsdotbl: 
+  vinsdotbl: 
+  vinsdot: 
+  idblstrok: 
+  jdblstrok: 
+  autem: 
+  inodotogon: 
+  orrotlig: 
+  slonglbarlig: 
+  q2app: 
+  qcentrslstrok: 
+  slongflour: 
+  slongslstrok: 
+  vslash: 
+  vslashura: 
+  vslashuradbl: 
+  xslashula: 
+  xslashlra: 
+  q3app: 
+  thornrarmlig: 
+  Hrarmlig: 
+  hrarmlig: 
+  krarmlig: 
+  UUlig: 
+  uulig: 
+  UElig: 
+  xslashlradbl: 
+  aeligring: 
+  aeligogonacute: 
+  adiaguml: 
+  odiaguml: 
+  Antiphon: 
+  Hymnus: 
+  Psalmus: 
+  psalmus: 
+  Psalmi: 
+  psalmi: 
+  aisup: 
+  iosup: 
+  iusup: 
+  jesup: 
+  mesup: 
+  oosup: 
+  resup: 
+  uasup: 
+  uvsup: 
+  uwsup: 
+  wasup: 
+  wusup: 
+  wvsup: 
+  grlig: 
+  qvinslig: 
+  gplig: 
+  slongdestlig: 
+  lmhgzedlig: 
+  slongmhgzedlig: 
+  slongimhgzedlig: 
+  aenlacute: 
+  aeligenl: 
+  aenlosmalllig: 
+  eogonenl: 
+  slongaumllig: 
+  slonghlig: 
+  slongilig: 
+  slongllig: 
+  slongoumllig: 
+  slongplig: 
+  slongslonglig: 
+  slongslongilig: 
+  slongslongllig: 
+  slongtilig: 
+  slongtrlig: 
+  slonguumllig: 
+  slongvinslig: 
+  hslonglig: 
+  kslonglig: 
+  slongacute: 
+  AVligslashacute: 
+  avligslashacute: 
+  drotacute: 
+  Finsacute: 
+  finsacute: 
+  Muncacute: 
+  muncacute: 
+  Ocurlacute: 
+  ocurlacute: 
+  rrotacute: 
+  Vinsacute: 
+  vinsacute: 
+  eacombcirc: 
+  eucombcirc: 
+  ucurlbar: 
+  AOligdblac: 
+  aoligdblac: 
+  AVligdblac: 
+  avligdblac: 
+  Oogondblac: 
+  oogondblac: 
+  Oslashdblac: 
+  oslashdblac: 
+  OEligdblac: 
+  oeligdblac: 
+  YYligdblac: 
+  yyligdblac: 
+  Oslashdot: 
+  oslashdot: 
+  pscapdot: 
+  bscapdot: 
+  drotdot: 
+  dscapdot: 
+  Finsdot: 
+  finsdot: 
+  finssemiclosedot: 
+  finsclosedot: 
+  fscapdot: 
+  hscapdot: 
+  kscapdot: 
+  lscapdot: 
+  mscapdot: 
+  Oogondot: 
+  oogondot: 
+  Oslashdotbl: 
+  oslashdotbl: 
+  Juml: 
+  juml: 
+  OOliguml: 
+  ooliguml: 
+  PPliguml: 
+  ppliguml: 
+  YYliguml: 
+  yyliguml: 
+  AEligcurl: 
+  aeligcurl: 
+  Oslashmacracute: 
+  oslashmacracute: 
+  Oslashbreve: 
+  oslashbreve: 
+  AVligogon: 
+  avligogon: 
+  Eogoncurl: 
+  eogoncurl: 
+  Adotacute: 
+  adotacute: 
+  Idotacute: 
+  idotacute: 
+  Odotacute: 
+  odotacute: 
+  Oogondotacute: 
+  oogondotacute: 
+  Oslashdotacute: 
+  oslashdotacute: 
+  Udotacute: 
+  udotacute: 
+  bblig: 
+  bglig: 
+  cklig: 
+  ctlig: 
+  drotdrotlig: 
+  eylig: 
+  faumllig: 
+  fjlig: 
+  frlig: 
+  ftlig: 
+  fuumllig: 
+  fylig: 
+  fftlig: 
+  ffylig: 
+  ftylig: 
+  gglig: 
+  gdlig: 
+  gdrotlig: 
+  gethlig: 
+  nscapslonglig: 
+  pplig: 
+  ppflourlig: 
+  trlig: 
+  ttlig: 
+  trottrotlig: 
+  tylig: 
+  tzlig: 
+  PPlig: 
+  golig: 
+  slongenl: 
+  aenl: 
+  benl: 
+  cenl: 
+  denl: 
+  drotenl: 
+  ethenl: 
+  eenl: 
+  fenl: 
+  genl: 
+  henl: 
+  ienl: 
+  jenl: 
+  kenl: 
+  lenl: 
+  menl: 
+  nenl: 
+  oenl: 
+  penl: 
+  qenl: 
+  renl: 
+  senl: 
+  tenl: 
+  thornenl: 
+  uenl: 
+  venl: 
+  wenl: 
+  xenl: 
+  yenl: 
+  zenl: 
+  inodotenl: 
+  jnodotenl: 
+  finsenl: 
+  xscap: 
+  thornscap: 
+  gscapdot: 
+  nscapdot: 
+  rscapdot: 
+  sscapdot: 
+  tscapdot: 
+  bscapdotbl: 
+  dscapdotbl: 
+  gscapdotbl: 
+  lscapdotbl: 
+  mscapdotbl: 
+  nscapdotbl: 
+  rscapdotbl: 
+  sscapdotbl: 
+  tscapdotbl: 
+  aacloselig: 
+  anecklesselig: 
+  anecklessvlig: 
+  aflig: 
+  afinslig: 
+  aglig: 
+  allig: 
+  anlig: 
+  anscaplig: 
+  aplig: 
+  arlig: 
+  arscaplig: 
+  athornlig: 
+  oclig: 
+  AnecklessElig: 
+  ORrotlig: 
+  orumlig: 
+  ORUMlig: 
+  uuligdblac: 
+  UUligdblac: 
+  AEligdotacute: 
+  aeligdotacute: 
+  oeligenl: 
+  aoligenl: 
+  aaligenl: 
+  AAligacute: 
+  aaligacute: 
+  AOligacute: 
+  aoligacute: 
+  AUligacute: 
+  auligacute: 
+  AVligacute: 
+  avligacute: 
+  OOligacute: 
+  ooligacute: 
+  AAligdblac: 
+  aaligdblac: 
+  OOligdblac: 
+  ooligdblac: 
+  AAligdot: 
+  aaligdot: 
+  AYligdot: 
+  ayligdot: 
+  AAligdotbl: 
+  aaligdotbl: 
+  AOligdotbl: 
+  aoligdotbl: 
+  AUligdotbl: 
+  auligdotbl: 
+  AVligdotbl: 
+  avligdotbl: 
+  AYligdotbl: 
+  ayligdotbl: 
+  OOligdotbl: 
+  ooligdotbl: 
+  AAliguml: 
+  aaliguml: 
+  macrhigh: 
+  macrmed: 
+  ovlhigh: 
+  ovlmed: 
+  bscapsup: 
+  dscapsup: 
+  kscapsup: 
+  muncsup: 
+  tscapsup: 
+  ysup: 
+  inodotsup: 
+  jsup: 
+  jnodotsup: 
+  oslashsup: 
+  qsup: 
+  anligsup: 
+  arligsup: 
+  anscapligsup: 
+  thornsup: 
+  orrotsup: 
+  orumsup: 
+  rumsup: 
+  cmacr: 
+  rmacr: 
+  basup: 
+  besup: 
+  binodotsup: 
+  bosup: 
+  brsup: 
+  busup: 
+  bvsup: 
+  bra: 
+  ber: 
+  burlemn: 
+  bus: 
+  hus: 
+  hasup: 
+  hesup: 
+  hinodotsup: 
+  hmuncsup: 
+  hosup: 
+  hrsup: 
+  her: 
+  husup: 
+  hvsup: 
+  htsup: 
+  hra: 
+  hurlemn: 
+  kasup: 
+  kesup: 
+  kinodotsup: 
+  klscapsup: 
+  kosup: 
+  krsup: 
+  krscapsup: 
+  kusup: 
+  kvsup: 
+  kus: 
+  kzsup: 
+  thorner: 
+  thornasup: 
+  thornesup: 
+  thorninodotsup: 
+  thornosup: 
+  thornrsup: 
+  thornra: 
+  thorntsup: 
+  thorntrotsup: 
+  trotmacr: 
+  trotdot: 
+  drotesup: 
+  drotinodotsup: 
+  drotosup: 
+  drotrsup: 
+  drotrscapsup: 
+  drotrscapdotsup: 
+  droter: 
+  droturlemn: 
+  drotzsup: 
+  drotra: 
+  ethinodotsup: 
+  ethmuncsup: 
+  ethrsup: 
+  ethrscapsup: 
+  ethrscapdotsup: 
+  ethtsup: 
+  ether: 
+  finsmacr: 
+  fer: 
+  ker: 
+  ler: 
+  lerfin: 
+  slonger: 
+  hmscapsup: 
+  kra: 
+  kurlemn: 
+  eenlacute: 
+  henlmacrmed: 
+  Ginodotsup: 
+  Ver: 
+  oslashcurlacute: 
+  eracute: 
+  ocurlsup: 
+  aacutesup: 
+  aeligacutesup: 
+  amacrsup: 
+  eacutesup: 
+  erhigh: 
+  rscapdotsup: 
+  gmacr: 
+  ethmacr: 
+  ethtrotsup: 
+  htrotsup: 
+  drotvlig: 
+  gvlig: 
+  drotvligmacr: 
+  avligmacr: 
+  ethvlig: 
+  thornvlig: 
+  nvlig: 
+  aenlvlig: 
+  nvmacrlig: 
+  amacrnscaplig: 
+  aacutevlig: 
+  aenlvmacrlig: 
+  avmacrlig: 
+  aacutevmacrlig: 
+  combcircledot: 
+  ethurllemn: 
+  Csqu: 
+  Murlemn: 
+  ndotsup: 
+  ermod: 
+  Eunc: 
+  ercurlmod: 
+  Gsqu: 
+  Hunc: 
+  Munc: 
+  Sclose: 
+  slongdes: 
+  sclose: 
+  arscapligsup: 
+  eogonsup: 
+  emacrsup: 
+  Asqu: 
+  oogonsup: 
+  omacrsup: 
+  thornbarslash: 
+  etslash: 
+  de: 
+  punctinter: 
+  dcurl: 
+  fcurl: 
+  kcurl: 
+  gcurl: 
+  ccurl: 
+  tcurl: 
+  nflour: 
+  rflour: 
+  USbase: 
+  usbase: 
+  ETslash: 
+  sem: 
+  chlig: 
+  foumllig: 
+  smallzero: 
+  Xmod: 
+  arbar: 
+  rabar: 
+  urlemn: 
+  combcurlhigh: 
+  erang: 
+  ercurl: 
+  combdothigh: 
+  combcurlbar: 
+  borrings: 
+  dblcross: 
+  posit: 
+  ductsimpl: 
+  punctposit: 
+  colmidcomposit: 
+  tridotscomposit: 
+  punctexclam: 
+  punctintertilde: 
+  punctvers: 
+  renvoi: 
+  punctelevdiag: 
+  punctinterlemn: 
+  bidotscomposit: 
+  punctflex: 
+  virgmin: 
+  hidot: 
+  wavylin: 
+  punctelevhiback: 
+  punctelevhack: 
+  combtripbrevebl: 
+  ains: 
+  Ains: 
+  aopen: 
+  aclose: 
+  aeligred: 
+  AOligred: 
+  aoligred: 
+  finsclose: 
+  kunc: 
+  kclose: 
+  aunc: 
+  aneckless: 
+  Euncclose: 
+  eunc: 
+  eext: 
+  etall: 
+  finssemiclose: 
+  finsdothook: 
+  gdivloop: 
+  glglowloop: 
+  gsmlowloop: 
+  ilong: 
+  ksemiclose: 
+  ldes: 
+  mrdes: 
+  Muncdes: 
+  mmeduncacute: 
+  muncdes: 
+  nrdes: 
+  Nrdes: 
+  nscaprdes: 
+  nscapldes: 
+  Qstem: 
+  yrgmainstrok: 
+  mhgzed: 
+  imhgzedlig: 
+  hrdes: 
+  munc: 
+  muncsmallacute: 
+  romnumCrevovl: 
+  romaslibr: 
+  romscapxbar: 
+  romscapybar: 
+  romscapdslash: 
+  dram: 
+  ecu: 
+  florloop: 
+  grosch: 
+  libradut: 
+  librafren: 
+  libraital: 
+  libraflem: 
+  liranuov: 
+  lirasterl: 
+  markold: 
+  markflour: 
+  msign: 
+  msignflour: 
+  obol: 
+  penningar: 
+  reichtalold: 
+  schillgerm: 
+  schillgermscript: 
+  scudi: 
+  krone: 
+  helbing: 
+  ouncescript: 
+  Cnumbar: 
+  cnumbar: 
+  slonglovlmed: 
+  slonglslashlig: 
+  lllig: 
+  slongchlig: 
+  slongjlig: 
+  slongklig: 
+  slongslig: 
+  slongslongklig: 
+  slongslongtlig: 
+  metrmacracute: 
+  metrmacrgrave: 
+  metrbreveacute: 
+  metrbrevegrave: 
+  metrmacrbreveacute: 
+  metrmacrbrevegrave: 
+  metranc: 
+  metrancacute: 
+  metrancgrave: 
+  metrmacrdblac: 
+  metrmacrdblgrave: 
+  metrbrevedblac: 
+  metrbrevedblgrave: 
+  metrancdblac: 
+  metrancdblgrave: 
+  metrdblbrevemacracute: 
+  metrdblbrevemacrdblac: 
+  Vovlhigh: 
+  Xovlhigh: 
+  Lovlhigh: 
+  Covlhigh: 
+  Dovlhigh: 
+  mufidbldolph: 
+  fflig: ﬀ
+  filig: ﬁ
+  fllig: ﬂ
+  ffilig: ﬃ
+  ffllig: ﬄ
+  slongtlig: ﬅ
+  stlig: ﬆ
+  sextans: 𐆐
+  romunc: 𐆑
+  romsemunc: 𐆒
+  romsext: 𐆓
+  romdimsext: 𐆔
+  romsiliq: 𐆕
+  romXbar: 𐆖
+  romquin: 𐆗
+  sestert: 𐆘
+  romdupond: 𐆙
+  romas: 𐆚
+preset: null
+rules: []
+fonts:
+  Fraktur:
+    character-classes:
+      roudletter: "[\\m{O}\\m{B}\\m{P}\\m{H}\\m{W}\\m{D}]"
+    entities:
+      s-long:
+        - $
