@@ -36,7 +36,7 @@ properties:
 
       ONLY IF THIS IS NOT THE CASE, you MAY use metaschema's YAML file.
     type: string
-    const: ./paleography.metaschema.yaml
+    const: https://raw.githubusercontent.com/Early-Music-Typesetting/paleography/refs/heads/main/paleography.metaschema.json
   version:
     title: Version
     description: Version of the Paleography specification.
@@ -77,7 +77,7 @@ properties:
         format: timestamp
         pattern: "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9\
           ][0-9](\\.[0-9]*[1-9])?Z"
-        const: 2026-10-24T02:18:18.664Z
+        const: 2026-10-24T02:20:53.151Z
   regex-extensions:
     title: Regex extensions
     description: >

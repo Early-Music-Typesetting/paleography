@@ -1,8 +1,8 @@
-$schema: ./paleography.metaschema.yaml
+$schema: https://raw.githubusercontent.com/Early-Music-Typesetting/paleography/refs/heads/main/paleography.metaschema.json
 version: 0.9.0
 mufi-snapshot:
   url: https://mufi.info/q.php?q=mufiexport
-  date: 2026-10-24T02:18:18.664Z
+  date: 2026-10-24T02:20:53.151Z
 regex-extensions:
   paleo-class:
     pattern: \[:([a-z]+|\*+|\<|\>|\[|\]|!|\\):\]

@@ -8,7 +8,7 @@ const DIR = './specification'
 const META = yaml.parse(readFileSync(join(DIR, 'paleography.metaschema.yaml'), 'utf8'))
 const SPEC = yaml.parse(readFileSync(join(DIR, 'paleography.yaml'), 'utf8'))
 
-const SCHEMA_ID = ''
+const SCHEMA_ID = 'https://raw.githubusercontent.com/Early-Music-Typesetting/paleography/refs/heads/main/paleography.metaschema.json'
 
 /**
  * All spec versioning depends on NPM publishing.
@@ -21,8 +21,9 @@ function setVersion(): void {
 
 function setSchemaId(): void {
 
-  META.properties.$schema.const
-  SPEC.$schema = SCHEMA_ID ? SCHEMA_ID : SPEC.$schema
+  const id = SCHEMA_ID ? SCHEMA_ID : SPEC.$schema
+  META.properties.$schema.const = id
+  SPEC.$schema = id
 
 }
 
