@@ -144,7 +144,6 @@ async function setFont() {
 }
 
 setVersion()
-setSchemaId()
 await setMUFIData()
 await setRules()
 await setPresets()
@@ -152,10 +151,18 @@ await setFont()
 
 // console.log(META.$defs['rule-definition'].properties.entities)
 
+/*
+  Write for debug.
+*/
+writeFileSync("debug/paleography.metaschema.yaml", yaml.stringify(META))
+writeFileSync("debug/paleography.yaml", yaml.stringify(SPEC))
 
+setSchemaId()
 writeFileSync("paleography.metaschema.json", JSON.stringify(META))
 writeFileSync("paleography.metaschema.yaml", yaml.stringify(META))
 writeFileSync("paleography.yaml", yaml.stringify(SPEC))
+
+
 
 /*
 
