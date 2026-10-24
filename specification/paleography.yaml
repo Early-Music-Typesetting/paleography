@@ -2,11 +2,11 @@
 ---
 $schema: './paleography.metaschema.yaml'
 
-version: 0.8.0
+version: './../package.json#/version'
 
 mufi-snapshot:
   url: https://mufi.info/q.php?q=mufiexport
-  date: 0000-00-00
+  date: 0000-00-00T00:00:00.001Z
 
 regex-extensions:
 
@@ -43,7 +43,6 @@ character-classes:
   '!': \t{expand}
   '\': \t{macro-start}
   vowel: '[\m{A}\m{E}\m{I}\m{O}\m{U}\m{Y}]'
-  # TO DO: those should be definiable by font!
   roudletter: '[\m{O}\m{B}\m{P}\m{H}\m{W}]' # Fractur has also "d"
 
 rule-definitions:
@@ -171,13 +170,6 @@ rule-definitions:
       always: ["#1"]
       indicated: ["#1*"]
       never: []
-
-  # inodot:
-  #   class: allograph
-  #   pattern: i[:*:]
-  #   unicode: ı
-  #   mufi: inodot
-  #   allographs: [i]
 
   i-initial-enlarged:
     description: Initial small "i" enlarges.
@@ -378,7 +370,7 @@ rule-definitions:
     target: v-round
 
 
-presets: # TO DO: metaschema, update.
+presets:
 
   medieval:
   - i-dotless: always
@@ -388,7 +380,7 @@ presets: # TO DO: metaschema, update.
   - nasal: indicated
   - v-round: always
   - r-rotunda: auto
-  - y-dotted: always
+  - y-dotted: always-single
   - christ: indicated
 
   renaissance:
@@ -398,9 +390,20 @@ presets: # TO DO: metaschema, update.
   - v-round: always
   - r-rotunda: auto
 
+
+unicode: {} # Overriden at build.
+
+preset: null
+
+rules: []
+
 fonts:
 
-  ...
+  Fraktur:
+    character-classes:
+      roudletter: '[\m{O}\m{B}\m{P}\m{H}\m{W}\m{D}]'
+    entities:
+      s-long: [$]
 
   # insular
 
