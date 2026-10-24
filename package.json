@@ -1,6 +1,6 @@
 {
   "name": "paleography",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -13,6 +13,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.22.0",
   "devDependencies": {
+    "jsonata": "^2.2.2",
     "typescript": "^7.0.2",
     "yaml": "^2.9.1"
   }

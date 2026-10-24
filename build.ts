@@ -1,9 +1,162 @@
-import { readFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
+import { join } from 'path'
 import * as yaml from 'yaml'
+import jsonata from 'jsonata'
+import PKG from './package.json' with { type: 'json' }
 
-const meta = yaml.parse(readFileSync('./dev/paleography.metaschema.yaml', 'utf8'))
-// const spec = yaml.parse(readFileSync('./dev/paleography.yaml', 'utf8'))
+const DIR = './specification'
+const META = yaml.parse(readFileSync(join(DIR, 'paleography.metaschema.yaml'), 'utf8'))
+const SPEC = yaml.parse(readFileSync(join(DIR, 'paleography.yaml'), 'utf8'))
 
+const SCHEMA_ID = ''
+
+/**
+ * All spec versioning depends on NPM publishing.
+ */
+function setVersion(): void {
+  const version = PKG.version as `${number}.${number}.${number}`
+  META.properties.version.const = version
+  SPEC.version = version
+}
+
+function setSchemaId(): void {
+
+  META.properties.$schema.const
+  SPEC.$schema = SCHEMA_ID ? SCHEMA_ID : SPEC.$schema
+
+}
+
+async function setMUFIData(): Promise<void> {
+
+  const url = 'https://mufi.info/q.php?q=mufiexport'
+
+  const assertURL = () => {
+    const specURL = SPEC['mufi-snapshot'].url
+    const metaURL = META.properties['mufi-snapshot'].properties.url.const
+    const valid = [specURL, metaURL].every(u => u === url)
+    if (!valid) {
+      throw Error("MUFI's url has changed for the build script but not for the specifications.")
+    }
+  }
+
+  const setDate = () => {
+    const timestamp = new Date().toISOString()
+    META.properties['mufi-snapshot'].properties.date.const = timestamp
+    SPEC['mufi-snapshot'].date = timestamp
+  }
+
+  const getEntity2UTF = async (mufi: { ent: string, utf8: string }[]): Promise<Record<string, string>> => {
+    const query = jsonata(`$[]{ $match(ent, /&(\\w+);/).groups[0]: utf8 }`)
+    const result = await query.evaluate(mufi)
+    return result
+  }
+
+  assertURL()
+
+  await fetch(url).then(r => r.json()).then(async mufi => {
+
+    setDate()
+    const entities = await getEntity2UTF(mufi)
+    META.$defs['rule-definition'].properties.entities.items.enum = Object.keys(entities)
+    SPEC.unicode = entities
+
+  })
+}
+
+async function setRules() {
+
+  // TO DO: deprecation.
+
+  const query = jsonata(`
+
+    $each($."rule-definitions", function($val, $key) {
+      {
+        $key: {
+          "title": $val.description,
+          "description": $val.remarks,
+          "type": "string",
+          "enum": $keys($val.settings)
+        }
+      }
+    }) ~> $merge
+
+  `)
+
+  const rules = await query.evaluate(SPEC)
+
+  META.properties['rules'].items.properties = rules
+
+}
+
+async function setPresets() {
+
+  const query = jsonata(`
+
+    $each($.presets, function($value, $key) {
+      { $key: {"$ref": "#/properties/rules"} }
+    }) ~> $merge
+
+  `)
+
+  const presets = await query.evaluate(SPEC)
+
+  META.properties.presets.properties = presets
+  META.properties.preset.enum = [null, ...Object.keys(presets)]
+
+}
+
+async function setFont() {
+
+  const queryCharacterClasses = jsonata(`
+
+    $each($.'character-classes', function($val, $key) {
+      $match($key, /[a-z]+/) ? {$key: { "type": "string", "format": "regex", "default": $val } }
+    }) ~> $merge
+
+  `)
+
+  const characterClasses = await queryCharacterClasses.evaluate(SPEC)
+
+  META.properties.fonts.additionalProperties.properties['character-classes'].properties = characterClasses
+
+  const queryEntities = jsonata(`(
+
+    $unicode := function($ent) { $lookup($.unicode, $ent) };
+
+    $each($."rule-definitions", function($val, $key) {
+      {
+        $key: {
+          "title": $val.description,
+          "description": $val.remarks,
+          "type": "array",
+          "prefixItems": $val.entities[].{"title": $, "type": "string", "default": $unicode($)}
+        }
+      }
+    }) ~> $merge
+
+  )`)
+
+  const entities = await queryEntities.evaluate(SPEC)
+
+  console.log(entities['con-initial'].prefixItems)
+
+  META.properties.fonts.additionalProperties.properties.entities.properties = entities
+
+}
+
+setVersion()
+setSchemaId()
+await setMUFIData()
+await setRules()
+await setPresets()
+await setFont()
+
+// console.log(META.$defs['rule-definition'].properties.entities)
+
+
+writeFileSync("paleography.metaschema.json", JSON.stringify(META))
+writeFileSync("paleography.metaschema.yaml", yaml.stringify(META))
+writeFileSync("paleography.yaml", yaml.stringify(SPEC))
 
 /*
 
@@ -26,6 +179,3 @@ const meta = yaml.parse(readFileSync('./dev/paleography.metaschema.yaml', 'utf8'
   2) json (schema, metaschema) * note correct $schema id
 
 */
-
-
-console.log(meta)
